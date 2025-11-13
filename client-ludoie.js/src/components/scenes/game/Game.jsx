@@ -7,10 +7,28 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { drawBoard } from "./board";
 import {fitRendererToCanvas, cloneWithUniqueMaterials, tintObject} from './utilsTHREE';
 
-export default function Game({roomNumber, players}){
+export default function Game({roomNumber, players, socket, username, setPlayers}){
+  const launchDice = () => {
+    var isYourTurnToPlay = false;
+    for(const player of players){
+      if(player.isPlaying && player.username === username){
+        isYourTurnToPlay = true;
+        socket.emit("launchDice", username, roomNumber);
+      }
+    }
+    if(!isYourTurnToPlay){
+      console.log("PAS TON TOUR BATARD !")
+    }
+  }
+
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    socket.on("diceLaunched", (username, dice, players) => {
+      console.log(username + " a fait un " + dice + " ! ");
+      setPlayers(players);
+    })
+
     const canvas = canvasRef.current;
     if(!canvas) return;
 
@@ -111,6 +129,7 @@ export default function Game({roomNumber, players}){
   return (
     <>
       <canvas ref={canvasRef}></canvas>
+      <img src="dice01.png" alt="dice" onClick={launchDice}/>
     </>
   )
 }

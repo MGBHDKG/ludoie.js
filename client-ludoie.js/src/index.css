@@ -8,3 +8,10 @@ canvas {
    height: 100%;
    display: block;
 }
+
+img {
+   position: absolute;
+   right: 50px;
+   bottom: 50px;
+   cursor: pointer;
+}

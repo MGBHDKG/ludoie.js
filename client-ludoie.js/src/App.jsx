@@ -44,8 +44,8 @@ export default function App() {
       setPlayers(playersInRoom);
     });
 
-    socket.on("allStartGame", (room) => {
-      console.log(room);
+    socket.on("allStartGame", (players) => {
+      setPlayers(players);
       setScreen("game");
     });
   }, []);
@@ -59,7 +59,7 @@ export default function App() {
       }
       {
         screen === "game" && (
-          <Game roomNumber={roomNumber} players={players} />
+          <Game roomNumber={roomNumber} players={players} socket={socket} username={username} setPlayers={setPlayers}/>
         )
       }
       {

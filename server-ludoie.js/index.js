@@ -2,6 +2,8 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
+import { randomBytes, randomInt } from "crypto";
+
 const PORT = 4000;
 const app = express();
 const httpServer = createServer(app);
@@ -16,10 +18,26 @@ function generateSixDigitNumber() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+function launchDice(){
+    return randomInt(1,7);
+}
+
 let rooms = new Map();
 let map = new Map();
 let base = new Map();
 let playersTurnIndex = new Map();
+
+function nextTurn(code){
+    let players = rooms.get(code);
+    let index = playersTurnIndex.get(code);
+
+    players[index].isPlaying = false;
+    let nextPlayer = (index + 1) % 2;
+    players[nextPlayer].isPlaying = true;
+
+    rooms.set(code, players);
+    playersTurnIndex.set(code, nextPlayer);
+}
 
 io.on("connection", (socket) => {
     console.log("✅ Un client est connecté : " + socket.id);
@@ -63,17 +81,73 @@ io.on("connection", (socket) => {
         for(let i=0; i<room.length; i++){
             players[i] = {
                 username: room[i],
-                isPlaying: false
+                isPlaying: false, 
+                index: i
             }
         }
         players[0].isPlaying = true;
 
         rooms.set(code, players);
         playersTurnIndex.set(code, 0);
-        map.set(code, ["groscaca"]);
-        base.set(code, ["énorme caca"]);
+        map.set(code, {
+            map: [
+                0,
+                -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+                1,
+                -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+                2,
+                -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+                3,
+                -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            ],
+
+            startIndex : {
+                0: 0,
+                1: 12,
+                2: 24,
+                3: 36
+            },
+
+            homeEntryIndex : {
+                0: 47,
+                1: 11,
+                2: 23,
+                3: 35
+            },
+
+            home : {
+                0: [-1,-1,-1,-1],
+                1: [-1,-1,-1,-1],
+                2: [-1,-1,-1,-1],
+                3: [-1,-1,-1,-1],
+            }
+        });
+
+        base.set(code, [
+            ['A','B','C','D'],
+            ['E','F','G','H'],
+            ['I','J','K','L'],
+            ['M','N','O','P']
+        ]);
 
         io.to(code).emit("allStartGame", players);
+    })
+
+    socket.on("launchDice", (username, code) => {
+        let players = rooms.get(code);
+
+        for(const player of players){
+            if(player.isPlaying && player.username === username){
+                let dice = launchDice();
+                //FAIRE GESTION DE L'ANIMATION DE DE
+                nextTurn(code);
+                players = rooms.get(code);
+                io.to(code).emit("diceLaunched", username, dice, players);
+            }
+            else{
+                //TENTATIVE DE TRICHE
+            }
+        }
     })
 })
 
