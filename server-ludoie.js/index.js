@@ -32,8 +32,11 @@ function nextTurn(code){
     let index = playersTurnIndex.get(code);
 
     players[index].isPlaying = false;
-    let nextPlayer = (index + 1) % 2;
+    players[index].hasRolledThisTurn = false;
+
+    let nextPlayer = (index + 1) % players.length;
     players[nextPlayer].isPlaying = true;
+    players[nextPlayer].hasRolledThisTurn = false;
 
     rooms.set(code, players);
     playersTurnIndex.set(code, nextPlayer);
@@ -82,10 +85,12 @@ io.on("connection", (socket) => {
             players[i] = {
                 username: room[i],
                 isPlaying: false, 
-                index: i
+                index: i,
+                hasRolledThisTurn: false,
             }
         }
         players[0].isPlaying = true;
+        players[0].hasRolledThisTurn = false;
 
         rooms.set(code, players);
         playersTurnIndex.set(code, 0);
@@ -133,16 +138,18 @@ io.on("connection", (socket) => {
         io.to(code).emit("allStartGame", players);
     })
 
-    socket.on("launchDice", (username, code) => {
+    socket.on("launchDice", (username, code) => { 
         let players = rooms.get(code);
 
         for(const player of players){
-            if(player.isPlaying && player.username === username){
+            if(player.isPlaying && player.username === username && !player.hasRolledThisTurn){
+                player.hasRolledThisTurn = true;
                 let dice = launchDice();
                 //FAIRE GESTION DE L'ANIMATION DE DE
                 nextTurn(code);
                 players = rooms.get(code);
                 io.to(code).emit("diceLaunched", username, dice, players);
+                break;
             }
             else{
                 //TENTATIVE DE TRICHE
