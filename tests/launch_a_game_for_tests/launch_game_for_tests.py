@@ -85,4 +85,7 @@ time.sleep(1)
 launch_game = driver.find_element("id", "launchGame")
 launch_game.click()
 
+tabs = driver.window_handles
+driver.switch_to.window(tabs[0])
+
 time.sleep(5000)

@@ -142,6 +142,8 @@ io.on("connection", (socket) => {
                 -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
             ],
 
+            dice: 0,
+
             startIndex : {
                 0: 0,
                 1: 12,
@@ -191,8 +193,11 @@ io.on("connection", (socket) => {
                 console.log(`Room ${code} : ${username} a fait un ${dice}`);
                 io.to(code).emit("diceLaunched", dice);
 
-                let movablePawns = getMovablePawns(player, dice, code);
+                let board = map.get(code);
+                board.dice = dice;
+                map.set(code, board);
 
+                let movablePawns = getMovablePawns(player, dice, code);
                 if(movablePawns.length > 0) io.to(socket.id).emit("movablePawns", movablePawns);
                 else {
                     nextTurn(code);
@@ -206,6 +211,44 @@ io.on("connection", (socket) => {
                 //TENTATIVE DE TRICHE
             }
         }
+    })
+
+    socket.on("pawnSelected", (pawn,code,username) => {
+        //VERIFIER SI C BIEN LE TOUR ET BIEN UN PION DEPLACABLE
+        let board = map.get(code);
+        const dice = board.dice;
+
+        const player = players.find(p => p.isPlaying && p.username === username);
+        if (!player) {
+            console.log("Cheat / désync : pawnSelected par quelqu'un qui ne joue pas");
+            return;
+        }
+
+        const playerIndex = player.index;
+
+        if(dice === 5){
+            const bases = base.get(code);
+            const playerBase = bases[player.index];
+            bases[player.index] = playerBase.map(p => (p === pawn ? -1 : p));
+            base.set(code, bases);
+
+            const entryIndex = board.homeEntryIndex[player.index]
+            board.map[entryIndex] = pawn;
+            map.set(code, board);
+
+            io.to(code).emit('leaveBase', pawn, entryIndex);
+
+            nextTurn(code);
+            const updatedPlayers = rooms.get(code);
+            io.to(code).emit("turnChanged", updatedPlayers);
+            return;
+        }
+
+        // let oldIndex = board.map.indexOf(pawn);
+        // if(oldIndex == -1) return;
+
+        // let newIndex = (oldIndex + dice) % board.map.length;
+        //DETECTER FIN DE JEU
     })
 })
 
