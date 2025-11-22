@@ -1,5 +1,21 @@
 from selenium import webdriver
 import time
+from selenium.webdriver.chrome.options import Options
+
+options = Options()
+# Fenêtre plus petite = moins de pixels à dessiner
+options.add_argument("--window-size=1920,1280")
+
+# Désactiver GPU (à tester, parfois WebGL aime pas, mais sur certains setups ça aide)
+options.add_argument("--disable-gpu")
+
+# Optimisations classiques en CI
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--no-sandbox")
+
+# Mode headless (nouvelle version – WebGL marche mieux qu’avant)
+# Si ça casse ton WebGL, commente cette ligne
+options.add_argument("--headless=new")
 
 driver = webdriver.Chrome()
 driver.get("http://localhost:5173/")

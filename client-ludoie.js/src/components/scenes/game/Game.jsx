@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 
 import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
@@ -22,11 +22,23 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
   }
 
   const canvasRef = useRef(null);
+  const diceRef = useRef(null);
+
+  const color = ["#faf703", "#57cbff", "#ff0100", "#29db00"];
 
   useEffect(() => {
-    socket.on("diceLaunched", (username, dice, players) => {
-      console.log(username + " a fait un " + dice + " ! ");
-      setPlayers(players);
+    const dice = diceRef.current;
+
+    socket.on("diceLaunched", (diceNumber) => {
+      dice.src = `dice0${diceNumber}.png`;
+    })
+
+    socket.on("turnChanged", players => {
+      setPlayers(players)
+    })
+
+    socket.on("movablePawns", movablePawns => {
+      console.log(movablePawns);
     })
 
     const canvas = canvasRef.current;
@@ -90,25 +102,25 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
         }
 
         const tmpPawns = [
-          createPion(-8, -8, "#faf703", 1),
-          createPion(-12, -8, "#faf703", 2),
-          createPion(-8, -12, "#faf703", 3),
-          createPion(-12, -12, "#faf703", 4),
+          createPion(-8, -8, "#faf703", 'A'),
+          createPion(-12, -8, "#faf703", 'B'),
+          createPion(-8, -12, "#faf703", 'C'),
+          createPion(-12, -12, "#faf703", 'D'),
 
-          createPion( 8,  8, "#ff0100", 5),
-          createPion( 12,  8, "#ff0100", 6),
-          createPion( 8,  12, "#ff0100", 7),
-          createPion( 12,  12, "#ff0100", 8),
+          createPion( 8,  8, "#ff0100", 'E'),
+          createPion( 12,  8, "#ff0100", 'F'),
+          createPion( 8,  12, "#ff0100", 'G'),
+          createPion( 12,  12, "#ff0100", 'H'),
 
-          createPion( 8, -8, "#57cbff", 9),
-          createPion( 12, -8, "#57cbff", 10),
-          createPion( 8, -12, "#57cbff", 11),
-          createPion( 12, -12, "#57cbff", 12),
+          createPion( 8, -8, "#57cbff", 'I'),
+          createPion( 12, -8, "#57cbff", 'J'),
+          createPion( 8, -12, "#57cbff", 'K'),
+          createPion( 12, -12, "#57cbff", 'L'),
 
-          createPion(-8,  8, "#29db00", 13),
-          createPion(-12,  8, "#29db00", 14),
-          createPion(-8,  12, "#29db00", 15),
-          createPion(-12,  12, "#29db00", 16),
+          createPion(-8,  8, "#29db00", 'M'),
+          createPion(-12,  8, "#29db00", 'N'),
+          createPion(-8,  12, "#29db00", 'O'),
+          createPion(-12,  12, "#29db00", 'P'),
 
         ];
 
@@ -129,7 +141,17 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
   return (
     <>
       <canvas ref={canvasRef}></canvas>
-      <img src="dice01.png" alt="dice" onClick={launchDice}/>
+      <div id="players">
+        {players.map((player, index) => (
+          <div key={index} id="player" style={{backgroundColor: color[index], height: player.isPlaying ? 150 : 100}}>
+            <p>{player.username === username ? "Toi" : player.username}</p>
+          </div>
+        ))}
+      </div>
+      <div id="whosTurn">
+        A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi" : player.username : null))} de jouer
+      </div>
+      <img src="dice01.png" alt="dice" onClick={launchDice} ref={diceRef}/>
     </>
   )
 }

@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-import { randomBytes, randomInt } from "crypto";
+import { randomInt } from "crypto";
 
 const PORT = 4000;
 const app = express();
@@ -40,6 +40,42 @@ function nextTurn(code){
 
     rooms.set(code, players);
     playersTurnIndex.set(code, nextPlayer);
+}
+
+function getMovablePawns(player, dice, code){
+    let board = map.get(code);
+    let bases = base.get(code);
+    let movablePawns = [];
+
+    const entryIndex = board.homeEntryIndex[player.index];
+
+    if(dice === 5 && board.map[entryIndex] == -1){
+        for(const pawn of bases[player.index]){
+            if(pawn != -1) movablePawns.push(pawn);
+        }
+    }
+
+    let pawnsNotInBase = board.pawns[player.index];
+
+    for(const pawn of bases[player.index]){
+        if(pawn != -1) pawnsNotInBase = pawnsNotInBase.filter(p => p != pawn);
+    }
+
+    for(const pawn of pawnsNotInBase){
+        let oldIndex = board.map.indexOf(pawn);
+        if(oldIndex == -1) continue;
+
+        let newIndex = (oldIndex + dice) % board.map.length;
+
+        const target = board.map[newIndex];
+        if (pawnsNotInBase.includes(target)) continue;
+
+        //IL MANQUE DES CONDITIONS
+
+        movablePawns.push(pawn);
+    }
+
+    return movablePawns
 }
 
 io.on("connection", (socket) => {
@@ -125,6 +161,12 @@ io.on("connection", (socket) => {
                 1: [-1,-1,-1,-1],
                 2: [-1,-1,-1,-1],
                 3: [-1,-1,-1,-1],
+            },
+            pawns : {
+                0 : ['A','B','C','D'],
+                1 : ['E','F','G','H'],
+                2 : ['I','J','K','L'],
+                3 : ['M','N','O','P']
             }
         });
 
@@ -145,10 +187,19 @@ io.on("connection", (socket) => {
             if(player.isPlaying && player.username === username && !player.hasRolledThisTurn){
                 player.hasRolledThisTurn = true;
                 let dice = launchDice();
-                //FAIRE GESTION DE L'ANIMATION DE DE
-                nextTurn(code);
-                players = rooms.get(code);
-                io.to(code).emit("diceLaunched", username, dice, players);
+
+                console.log(`Room ${code} : ${username} a fait un ${dice}`);
+                io.to(code).emit("diceLaunched", dice);
+
+                let movablePawns = getMovablePawns(player, dice, code);
+
+                if(movablePawns.length > 0) io.to(socket.id).emit("movablePawns", movablePawns);
+                else {
+                    nextTurn(code);
+                    const updatedPlayers = rooms.get(code);
+                    io.to(code).emit("turnChanged", updatedPlayers);
+                }
+
                 break;
             }
             else{
