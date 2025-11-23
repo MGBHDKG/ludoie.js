@@ -1,6 +1,6 @@
 import {launchDice, generateSixDigitNumber} from "../game/randomGeneration.js";
-import {getRoom, getBoard, getBase, getTurnIndex, roomExists, setBase, setBoard, setRoom, setTurnIndex, setGame, nextTurn} from "../game/state.js"
-import { getMovablePawns } from "../game/pawns.js";
+import {getRoom, getBoard, getBase, getTurnIndex, roomExists, setBase, setBoard, setRoom, setGame, nextTurn} from "../game/state.js"
+import { getMovablePawns, backToBase } from "../game/pawns.js";
 
 export function socketHandlers(io){
     io.on("connection", (socket) => {
@@ -94,7 +94,7 @@ export function socketHandlers(io){
                 const playerIndex = player.index;   
                 const bases = getBase(code);
                 const playerBase = bases[playerIndex];
-                bases[playerIndex] = playerBase.map(p => (p === pawnToMove ? -1 : p));
+                bases[playerIndex] = playerBase.filter(p => p !== pawnToMove);
                 setBase(code, bases);
 
                 newPlaceOnBoard = board.homeEntryIndex[playerIndex];
@@ -106,6 +106,12 @@ export function socketHandlers(io){
                 newPlaceOnBoard = (oldPlaceOnBoard + dice) % board.map.length;
 
                 board.map[oldPlaceOnBoard] = -1;
+            }
+
+            const pawnOnNewPlace = board.map[newPlaceOnBoard]
+            if(pawnOnNewPlace != -1) {
+                backToBase(code, pawnOnNewPlace);
+                io.to(code).emit("backToBase", pawnOnNewPlace);
             }
 
             board.map[newPlaceOnBoard] = pawnToMove;

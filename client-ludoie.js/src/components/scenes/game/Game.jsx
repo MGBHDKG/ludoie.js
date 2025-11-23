@@ -112,6 +112,44 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       movablePawnsRef.current = [];
     });
 
+    socket.on("backToBase", (pawnId) => {
+      // Récupérer le pion via son id
+      const pawn = pawnsRef.current.find(p => p.userData.id === pawnId);
+      if (!pawn) {
+        console.warn("Pion introuvable pour backToBase :", pawnId);
+        return;
+      }
+
+      const { baseX, baseZ, color } = pawn.userData;
+      if (baseX === undefined || baseZ === undefined) {
+        console.warn("Position de base non définie pour le pion :", pawnId);
+        return;
+      }
+
+      // Remettre le pion à sa position de base
+      pawn.position.set(baseX, 0, baseZ);
+
+      // Reset visuel de tous les pions (comme dans movePawn)
+      pawnsRef.current.forEach(p => {
+        p.traverse(obj => {
+          if (!obj.isMesh) return;
+
+          if (obj.material.emissive) {
+            obj.material.emissive.set(0x000000);
+          }
+
+          obj.material.opacity = 1;
+          obj.material.transparent = false;
+
+          obj.material.color.set(p.userData.color);
+        });
+      });
+
+      // Vider la liste locale des pions jouables
+      movablePawnsRef.current = [];
+    });
+
+
     const canvas = canvasRef.current;
     if(!canvas) return;
 
@@ -145,7 +183,6 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
         const pionPrototype = root;
 
         function createPion(x, z, color, id) {
-          
           const model = cloneWithUniqueMaterials(pionPrototype);
           tintObject(model, color);
 
@@ -161,7 +198,14 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
           model.position.sub(center);     
           model.position.y += size.y / 2; 
           
-          pivot.userData = { id, color, isSelected: false };
+          // ⬇️ on ajoute baseX / baseZ
+          pivot.userData = { 
+            id, 
+            color, 
+            isSelected: false,
+            baseX: x,
+            baseZ: z,
+          };
           model.userData = { kind: "pawnModel" }; 
           
           pivot.add(model);
