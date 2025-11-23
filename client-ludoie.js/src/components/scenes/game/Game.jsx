@@ -63,7 +63,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       });
     });
 
-    socket.on("leaveBase", (pawnId, boardIndex) => {
+    socket.on("movePawn", (pawnId, boardIndex) => {
       // Récupérer le pion (le Group pivot) via son id
       const pawn = pawnsRef.current.find(p => p.userData.id === pawnId);
       if (!pawn) {
@@ -245,7 +245,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       socket.emit("pawnSelected", 
         pawnId,
         roomNumber,
-        player,
+        player.username,
       );
     }
 
