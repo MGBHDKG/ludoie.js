@@ -48,16 +48,23 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
         const isMovable = movablePawns.includes(pawn.userData.id);
 
         pawn.traverse(obj => {
-          if (obj.isMesh) {
-            if (isMovable) {
-              // le griser
-              obj.material.color.set("#FFFFFF");
-              obj.material.opacity = 1;
-              obj.material.transparent = false;
-            } else {
-              // remettre la couleur d’origine
-              obj.material.color.set(pawn.userData.color);
-            }
+          if (!obj.isMesh) return;
+
+          // enlever un éventuel highlight précédent
+          if (obj.material.emissive) {
+            obj.material.emissive.set(0x000000);
+          }
+
+          if (isMovable) {
+            // feedback visuel : par ex. blanc
+            obj.material.color.set("#FFFFFF");
+            obj.material.opacity = 1;
+            obj.material.transparent = false;
+          } else {
+            // remettre la couleur du joueur
+            obj.material.color.set(pawn.userData.color);
+            obj.material.opacity = 1;
+            obj.material.transparent = false;
           }
         });
       });
@@ -83,21 +90,25 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       // Déplacer le pivot du pion à cette case
       pawn.position.set(x, 0, z);
 
-      // Optionnel : enlever un éventuel effet de sélection / surbrillance
-      pawn.traverse(obj => {
-        if (obj.isMesh) {
+      // ✅ Après le déplacement : reset visuel de TOUS les pions
+      pawnsRef.current.forEach(p => {
+        p.traverse(obj => {
+          if (!obj.isMesh) return;
+
+          // enlever highlight
           if (obj.material.emissive) {
             obj.material.emissive.set(0x000000);
           }
+
           obj.material.opacity = 1;
           obj.material.transparent = false;
-          // remettre sa couleur d'origine
-          obj.material.color.set(pawn.userData.color);
-        }
+
+          // remettre la couleur du joueur
+          obj.material.color.set(p.userData.color);
+        });
       });
 
-      // On peut aussi vider les pions jouables côté client,
-      // le tour va de toute façon passer au suivant
+      // vider la liste locale des pions jouables
       movablePawnsRef.current = [];
     });
 

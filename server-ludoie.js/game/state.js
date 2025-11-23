@@ -84,3 +84,19 @@ export function setGame(code){
 
     return players;
 }
+
+
+export function nextTurn(code){
+    let players = getRoom(code);
+    let index = getTurnIndex(code);
+
+    players[index].isPlaying = false;
+    players[index].hasRolledThisTurn = false;
+
+    let nextPlayer = (index + 1) % players.length;
+    players[nextPlayer].isPlaying = true;
+    players[nextPlayer].hasRolledThisTurn = false;
+
+    setRoom(code, players);
+    setTurnIndex(code, nextPlayer);
+}
