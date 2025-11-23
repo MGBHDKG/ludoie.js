@@ -5,9 +5,9 @@ export function getMovablePawns(player, dice, code){
     let bases = getBase(code);
     let movablePawns = [];
 
-    const entryIndex = board.homeEntryIndex[player.index];
+    const startIndex = board.startIndex[player.index];
 
-    if(dice === 5 && board.map[entryIndex] == -1){
+    if(dice === 5 && board.map[startIndex] == -1){
         for(const pawn of bases[player.index]){
             if(pawn != -1) movablePawns.push(pawn);
         }

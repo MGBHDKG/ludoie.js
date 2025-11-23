@@ -47,14 +47,14 @@ export function setGame(code){
 
         dice: 0,
 
-        startIndex : {
-            0: 0,
-            1: 12,
-            2: 24,
-            3: 36
-        },
+        // startIndex : {
+        //     0: 0,
+        //     1: 12,
+        //     2: 24,
+        //     3: 36
+        // },
 
-        homeEntryIndex : {
+        startIndex : {
             0: 47,
             1: 11,
             2: 23,

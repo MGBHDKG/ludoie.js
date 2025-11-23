@@ -89,15 +89,16 @@ export function socketHandlers(io){
             }
 
             var newPlaceOnBoard = -1;
+            const startIndex = board.startIndex[player.index];
 
-            if(dice === 5){
+            if(dice === 5 && board.map[startIndex] == -1){
                 const playerIndex = player.index;   
                 const bases = getBase(code);
                 const playerBase = bases[playerIndex];
                 bases[playerIndex] = playerBase.filter(p => p !== pawnToMove);
                 setBase(code, bases);
 
-                newPlaceOnBoard = board.homeEntryIndex[playerIndex];
+                newPlaceOnBoard = board.startIndex[playerIndex];
             }
             else{
                 let oldPlaceOnBoard = board.map.indexOf(pawnToMove);
