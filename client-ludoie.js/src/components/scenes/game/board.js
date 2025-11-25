@@ -24,6 +24,7 @@ export function drawBoard() {
 }
 
 export const BOARD_POSITIONS = [
+    [-13.8,-2.3],
     [-11.5,-2.3],
     [-9.2,-2.3],
     [-6.9,-2.3],
@@ -74,5 +75,5 @@ export const BOARD_POSITIONS = [
     [-11.5,2.3],
     [-13.8,2.3],
     [-13.8, 0],
-    [-13.8,-2.3],
+    [-13.8,-2.3]
 ];

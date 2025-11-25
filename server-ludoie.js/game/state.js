@@ -47,26 +47,27 @@ export function setGame(code){
 
         dice: 0,
 
-        // startIndex : {
-        //     0: 0,
-        //     1: 12,
-        //     2: 24,
-        //     3: 36
-        // },
-
-        startIndex : {
+        endIndex : {
             0: 47,
             1: 11,
             2: 23,
             3: 35
         },
 
-        home : {
+        startIndex : {
+            0: 0,
+            1: 12,
+            2: 24,
+            3: 36
+        },
+
+        end : {
             0: [-1,-1,-1,-1],
             1: [-1,-1,-1,-1],
             2: [-1,-1,-1,-1],
             3: [-1,-1,-1,-1],
         },
+
         pawns : [
             ['A','B','C','D'],
             ['E','F','G','H'],
@@ -86,7 +87,7 @@ export function setGame(code){
 }
 
 
-export function nextTurn(code){
+export function moveToTheNextRound(code){
     let players = getRoom(code);
     let index = getTurnIndex(code);
 
@@ -99,4 +100,8 @@ export function nextTurn(code){
 
     setRoom(code, players);
     setTurnIndex(code, nextPlayer);
+}
+
+export function gameIsFinished(code){
+
 }

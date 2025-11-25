@@ -1,5 +1,5 @@
 import {launchDice, generateSixDigitNumber} from "../game/randomGeneration.js";
-import {getRoom, getBoard, getBase, getTurnIndex, roomExists, setBase, setBoard, setRoom, setGame, nextTurn} from "../game/state.js"
+import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, setGame, moveToTheNextRound} from "../game/state.js"
 import { getMovablePawns, backToBase } from "../game/pawns.js";
 
 export function socketHandlers(io){
@@ -64,7 +64,7 @@ export function socketHandlers(io){
                     }
                     else
                     {
-                        nextTurn(code);
+                        moveToTheNextRound(code);
                         const updatedPlayers = getRoom(code);
                         io.to(code).emit("turnChanged", updatedPlayers);
                     }
@@ -89,12 +89,24 @@ export function socketHandlers(io){
             }
 
             var newPlaceOnBoard = -1;
-            const startIndex = board.startIndex[player.index];
+            const playerIndex = player.index;
+            const bases = getBase(code);
+            const playerBase = bases[playerIndex];
+            
+            const pawnsOfThePlayer = board.pawns[playerIndex];
+            const startIndex = board.startIndex[playerIndex];
+            const startCase = board.map[startIndex];
 
-            if(dice === 5 && board.map[startIndex] == -1){
-                const playerIndex = player.index;   
-                const bases = getBase(code);
-                const playerBase = bases[playerIndex];
+            // ✅ la case de sortie est libre si vide ou occupée par un adversaire
+            const isStartCaseFree = (
+                startCase === -1 || 
+                !pawnsOfThePlayer.includes(startCase)
+            );
+
+            // ✅ savoir si le pion cliqué est en base
+            const isPawnInBase = playerBase.includes(pawnToMove);
+
+            if(dice === 5 && isStartCaseFree && isPawnInBase){ 
                 bases[playerIndex] = playerBase.filter(p => p !== pawnToMove);
                 setBase(code, bases);
 
@@ -120,7 +132,7 @@ export function socketHandlers(io){
 
             io.to(code).emit('movePawn', pawnToMove, newPlaceOnBoard);
 
-            nextTurn(code);
+            moveToTheNextRound(code);
             const updatedPlayers = getRoom(code);
             io.to(code).emit("turnChanged", updatedPlayers);
             //DETECTER FIN DE JEU
