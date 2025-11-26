@@ -50,6 +50,10 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       dice.src = `dice0${diceNumber}.png`;
     })
 
+    socket.on("gameIsFinished", winner => {
+      alert(winner + " a gagné la game !");
+    })
+
     socket.on("turnChanged", players => {
       setPlayers(players)
     })
@@ -106,6 +110,54 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       pawn.position.set(x, 0, z);
 
       // ✅ Après le déplacement : reset visuel de TOUS les pions
+      pawnsRef.current.forEach(p => {
+        p.traverse(obj => {
+          if (!obj.isMesh) return;
+
+          // enlever highlight
+          if (obj.material.emissive) {
+            obj.material.emissive.set(0x000000);
+          }
+
+          obj.material.opacity = 1;
+          obj.material.transparent = false;
+
+          // remettre la couleur du joueur
+          obj.material.color.set(p.userData.color);
+        });
+      });
+
+      // vider la liste locale des pions jouables
+      movablePawnsRef.current = [];
+    });
+
+    socket.on("movePawnToEndCase", (pawnId, playerIndex, endCaseIndex) => {
+      // Récupérer le pion via son id
+      const pawn = pawnsRef.current.find(p => p.userData.id === pawnId);
+      if (!pawn) {
+        console.warn("Pion introuvable pour movePawnToEndCase :", pawnId);
+        return;
+      }
+
+      // Récupérer la position de la case de fin pour ce joueur
+      const playerEndCases = END_BASE_POSITIONS[playerIndex];
+      if (!playerEndCases) {
+        console.warn("END_BASE_POSITIONS introuvable pour le joueur :", playerIndex);
+        return;
+      }
+
+      const endPos = playerEndCases[endCaseIndex];
+      if (!endPos) {
+        console.warn("END_BASE_POSITIONS introuvable pour l'index de fin :", endCaseIndex);
+        return;
+      }
+
+      const [x, z] = endPos;
+
+      // Déplacer le pion sur la case de fin
+      pawn.position.set(x, 0, z);
+
+      // ✅ Après le déplacement : reset visuel de TOUS les pions (même logique que dans movePawn)
       pawnsRef.current.forEach(p => {
         p.traverse(obj => {
           if (!obj.isMesh) return;

@@ -1,5 +1,5 @@
 import {launchDice, generateSixDigitNumber} from "../game/randomGeneration.js";
-import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, setGame, moveToTheNextRound} from "../game/state.js"
+import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, setGame, moveToTheNextRound, gameIsFinished} from "../game/state.js"
 import { getMovablePawns, backToBase } from "../game/pawns.js";
 
 export function socketHandlers(io){
@@ -49,8 +49,6 @@ export function socketHandlers(io){
                 if(player.isPlaying && player.username === username && !player.hasRolledThisTurn){
                     player.hasRolledThisTurn = true;
 
-                    console.log(cheat)
-
                     let dice = cheat === null ? launchDice() : cheat;
                     console.log(`Room ${code} : ${username} a fait un ${dice}`);
                     io.to(code).emit("diceLaunched", dice);
@@ -79,65 +77,132 @@ export function socketHandlers(io){
             }
         })
 
-        socket.on("pawnSelected", (pawnToMove,code,username) => {
+        socket.on("pawnSelected", (pawnToMove, code, username) => {
             //VERIFIER SI C BIEN LE TOUR ET BIEN UN PION DEPLACABLE
             let board = getBoard(code);
             const dice = board.dice;
             const players = getRoom(code);
             const player = players.find(p => p.isPlaying && p.username === username);
-            if (!player) {
+            if(!player){
                 console.log("Cheat / désync : pawnSelected par quelqu'un qui ne joue pas");
                 return;
             }
 
-            var newPlaceOnBoard = -1;
             const playerIndex = player.index;
             const bases = getBase(code);
             const playerBase = bases[playerIndex];
-            
+
             const pawnsOfThePlayer = board.pawns[playerIndex];
             const startIndex = board.startIndex[playerIndex];
             const startCase = board.map[startIndex];
 
-            // ✅ la case de sortie est libre si vide ou occupée par un adversaire
             const isStartCaseFree = (
-                startCase === -1 || 
+                startCase === -1 ||
                 !pawnsOfThePlayer.includes(startCase)
             );
 
-            // ✅ savoir si le pion cliqué est en base
             const isPawnInBase = playerBase.includes(pawnToMove);
 
-            if(dice === 5 && isStartCaseFree && isPawnInBase){ 
+            const boardLength = board.map.length;
+            const exit = board.endIndex[playerIndex];
+            const endCase = board.endCases[playerIndex];
+
+            let movedToEndCase = false;
+            let endCaseIndex = -1;
+
+            // Sortie de base sur un 5
+            if(dice === 5 && isStartCaseFree && isPawnInBase){
                 bases[playerIndex] = playerBase.filter(p => p !== pawnToMove);
                 setBase(code, bases);
 
-                newPlaceOnBoard = board.startIndex[playerIndex];
+                const newPlaceOnBoard = startIndex;
+                const pawnOnNewPlace = board.map[newPlaceOnBoard];
+
+                if(pawnOnNewPlace != -1){
+                    backToBase(code, pawnOnNewPlace);
+                    io.to(code).emit("backToBase", pawnOnNewPlace);
+                }
+
+                board.map[newPlaceOnBoard] = pawnToMove;
+                setBoard(code, board);
+
+                io.to(code).emit("movePawn", pawnToMove, newPlaceOnBoard);
             }
             else{
                 let oldPlaceOnBoard = board.map.indexOf(pawnToMove);
-                if(oldPlaceOnBoard == -1) return;
 
-                newPlaceOnBoard = (oldPlaceOnBoard + dice) % board.map.length;
+                // Pion déjà dans les cases de fin
+                if(oldPlaceOnBoard === -1){
+                    const indexInEnd = endCase.indexOf(pawnToMove);
+                    if(indexInEnd === -1) return;
 
-                board.map[oldPlaceOnBoard] = -1;
+                    const targetIndex = indexInEnd + dice;
+                    if(targetIndex >= endCase.length) return;
+                    if(endCase[targetIndex] != -1) return;
+
+                    endCase[indexInEnd] = -1;
+                    endCase[targetIndex] = pawnToMove;
+                    board.endCases[playerIndex] = endCase;
+                    setBoard(code, board);
+
+                    movedToEndCase = true;
+                    endCaseIndex = targetIndex;
+                }
+                else{
+                    const distanceToExit = exit - oldPlaceOnBoard;
+
+                    // Entrée dans les cases de fin
+                    if(distanceToExit >= 0 && dice > distanceToExit){
+                        const stepsToFirstEndCase = distanceToExit + 1;
+                        const indexInEndCases = dice - stepsToFirstEndCase; // 0..endCase.length-1
+
+                        if(indexInEndCases < 0 || indexInEndCases >= endCase.length) return;
+                        if(endCase[indexInEndCases] != -1) return;
+
+                        board.map[oldPlaceOnBoard] = -1;
+
+                        endCase[indexInEndCases] = pawnToMove;
+                        board.endCases[playerIndex] = endCase;
+                        setBoard(code, board);
+
+                        movedToEndCase = true;
+                        endCaseIndex = indexInEndCases;
+                    }
+                    else{
+                        // Déplacement normal sur le plateau
+                        const newPlaceOnBoard = (oldPlaceOnBoard + dice) % boardLength;
+                        const pawnOnNewPlace = board.map[newPlaceOnBoard];
+
+                        if(pawnOnNewPlace != -1){
+                            backToBase(code, pawnOnNewPlace);
+                            io.to(code).emit("backToBase", pawnOnNewPlace);
+                        }
+
+                        board.map[oldPlaceOnBoard] = -1;
+                        board.map[newPlaceOnBoard] = pawnToMove;
+                        setBoard(code, board);
+
+                        io.to(code).emit("movePawn", pawnToMove, newPlaceOnBoard);
+                    }
+                }
             }
 
-            const pawnOnNewPlace = board.map[newPlaceOnBoard]
-            if(pawnOnNewPlace != -1) {
-                backToBase(code, pawnOnNewPlace);
-                io.to(code).emit("backToBase", pawnOnNewPlace);
+            // Event spécial pour les cases de fin
+            if(movedToEndCase){
+                io.to(code).emit("movePawnToEndCase", pawnToMove, playerIndex, endCaseIndex);
             }
 
-            board.map[newPlaceOnBoard] = pawnToMove;
-            setBoard(code, board);
-
-            io.to(code).emit('movePawn', pawnToMove, newPlaceOnBoard);
+            //DETECTER FIN DE JEU
+            let gameState = gameIsFinished(code);
+            if(gameState.finished){
+                io.to(code).emit("gameIsFinished", players[gameState.winner].username);
+                return;
+            }
 
             moveToTheNextRound(code);
             const updatedPlayers = getRoom(code);
             io.to(code).emit("turnChanged", updatedPlayers);
-            //DETECTER FIN DE JEU
-        })
+        });
+
     })
 }

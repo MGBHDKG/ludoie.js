@@ -4,7 +4,7 @@ export function getMovablePawns(player, dice, code){
     let board = getBoard(code);
     let bases = getBase(code);
     let movablePawns = [];
-    const boardLength =  board.map.length;
+    const boardLength = board.map.length;
 
     const startIndex = board.startIndex[player.index];
     const startCase = board.map[startIndex];
@@ -16,41 +16,66 @@ export function getMovablePawns(player, dice, code){
         !pawnsOfThePlayer.includes(startCase)
     );
 
+    // Pions en base qui peuvent sortir sur un 5
     if(dice === 5 && isStartCaseFree){
         for(const pawn of bases[player.index]){
             if(pawn != -1) movablePawns.push(pawn);
         }
     }
 
+    // Pions du joueur qui ne sont plus en base
     let pawnsNotInBase = [...board.pawns[player.index]];
     const base = bases[player.index];
     for(const pawn of base){
         if(pawn != -1) pawnsNotInBase = pawnsNotInBase.filter(p => p != pawn);
     }
 
-
     for(const pawn of pawnsNotInBase){
         let oldPlaceOnBoard = board.map.indexOf(pawn);
+
+        // Déjà dans les cases finales
         if(oldPlaceOnBoard === -1){
-            //est dans la base : TODO
+            const endCase = board.endCases[player.index];
+            const indexOfThePlayerInEndCases = endCase.indexOf(pawn);
+            const targetIndexInEndCases = indexOfThePlayerInEndCases + dice;
+
+            if(
+                targetIndexInEndCases < endCase.length &&
+                endCase[targetIndexInEndCases] === -1
+            ){
+                movablePawns.push(pawn);
+            }
+            continue;
         }
 
-        let newPlaceOnBoard = (oldPlaceOnBoard + dice) % boardLength;
-
-        const target = board.map[newPlaceOnBoard];
-        if (pawnsNotInBase.includes(target)) continue;
-
+        // Encore sur le plateau
         const exit = board.endIndex[player.index];
         const distanceToExit = exit - oldPlaceOnBoard;
 
-        if (distanceToExit >= 0 && distanceToExit < dice) continue;
+        // Cas où on sort vers les cases finales
+        if(distanceToExit >= 0 && dice > distanceToExit){
+            const endCase = board.endCases[player.index];
+            const stepsToFirstEndCase = distanceToExit + 1;
+            const indexInEndCases = dice - stepsToFirstEndCase; // 0..3
 
-        //IL MANQUE DES CONDITIONS
+            if(indexInEndCases < 0 || indexInEndCases >= endCase.length) continue;
+            if(endCase[indexInEndCases] !== -1) continue;
+
+            movablePawns.push(pawn);
+            continue;
+        }
+
+        // Cas où on reste sur le plateau
+        let newPlaceOnBoard = (oldPlaceOnBoard + dice) % boardLength;
+        const target = board.map[newPlaceOnBoard];
+
+        // On ne peut pas tomber sur un de ses pions hors base
+        if(pawnsNotInBase.includes(target)) continue;
 
         movablePawns.push(pawn);
     }
 
-    return movablePawns
+    return movablePawns;
 }
 
 export function backToBase(code, pawnToEject) {
