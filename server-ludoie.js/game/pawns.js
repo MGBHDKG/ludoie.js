@@ -9,10 +9,8 @@ export function getMovablePawns(player, dice, code){
     const startIndex = board.startIndex[player.index];
     const startCase = board.map[startIndex];
 
-    // ✅ vrais pions du joueur
     const pawnsOfThePlayer = board.pawns[player.index];
 
-    // ✅ autoriser la sortie si vide OU pion adverse (donc pas un des tiens)
     const isStartCaseFree = (
         startCase === -1 ||
         !pawnsOfThePlayer.includes(startCase)
@@ -33,7 +31,9 @@ export function getMovablePawns(player, dice, code){
 
     for(const pawn of pawnsNotInBase){
         let oldPlaceOnBoard = board.map.indexOf(pawn);
-        if(oldPlaceOnBoard === -1) continue;//Peut etre dans la fin
+        if(oldPlaceOnBoard === -1){
+            //est dans la base : TODO
+        }
 
         let newPlaceOnBoard = (oldPlaceOnBoard + dice) % boardLength;
 
@@ -43,7 +43,7 @@ export function getMovablePawns(player, dice, code){
         const exit = board.endIndex[player.index];
         const distanceToExit = exit - oldPlaceOnBoard;
 
-        if (distanceToExit >= 0 && distanceToExit <= dice) continue;
+        if (distanceToExit >= 0 && distanceToExit < dice) continue;
 
         //IL MANQUE DES CONDITIONS
 
@@ -52,7 +52,6 @@ export function getMovablePawns(player, dice, code){
 
     return movablePawns
 }
-        //BUG QD PION ESSAYE DE SORTIR ET QUE QLQN AUTRE SUR LA SORTIE
 
 export function backToBase(code, pawnToEject) {
     let board = getBoard(code);

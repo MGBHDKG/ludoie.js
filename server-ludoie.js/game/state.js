@@ -61,12 +61,12 @@ export function setGame(code){
             3: 36
         },
 
-        end : {
-            0: [-1,-1,-1,-1],
-            1: [-1,-1,-1,-1],
-            2: [-1,-1,-1,-1],
-            3: [-1,-1,-1,-1],
-        },
+        endCases : [
+            [-1,-1,-1,-1],
+            [-1,-1,-1,-1],
+            [-1,-1,-1,-1],
+            [-1,-1,-1,-1],
+        ],
 
         pawns : [
             ['A','B','C','D'],
@@ -103,5 +103,13 @@ export function moveToTheNextRound(code){
 }
 
 export function gameIsFinished(code){
+    const board = getBoard(code);
+    const endCases = board.endCases;
 
+    for(let i=0; i<4; i++){
+        const isEndCaseFull = !endCases[i].includes(-1);
+        if(isEndCaseFull) return {finished: true, winner: i};
+    }
+
+    return {finished: false, quoicou : "beh"}
 }

@@ -42,14 +42,16 @@ export function socketHandlers(io){
             io.to(code).emit("allStartGame", players);
         })
 
-        socket.on("launchDice", (username, code) => { 
+        socket.on("launchDice", (username, code, cheat) => { 
             let players = getRoom(code);
 
             for(const player of players){
                 if(player.isPlaying && player.username === username && !player.hasRolledThisTurn){
                     player.hasRolledThisTurn = true;
 
-                    let dice = launchDice();
+                    console.log(cheat)
+
+                    let dice = cheat === null ? launchDice() : cheat;
                     console.log(`Room ${code} : ${username} a fait un ${dice}`);
                     io.to(code).emit("diceLaunched", dice);
                     let board = getBoard(code);
