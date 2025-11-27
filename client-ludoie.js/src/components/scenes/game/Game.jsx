@@ -4,6 +4,8 @@ import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
+import styled from "styled-components";
+
 import { drawBoard, BOARD_POSITIONS, END_BASE_POSITIONS } from "./board";
 import {fitRendererToCanvas, cloneWithUniqueMaterials, tintObject} from './utilsTHREE';
 
@@ -227,7 +229,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
     const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0000FF);
+    scene.background = new THREE.Color(0x267182);
 
     fitRendererToCanvas(renderer, camera, canvas);
 
@@ -384,7 +386,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
   }, [])
 
   return (
-    <>
+    <GameStyle>
       <canvas ref={canvasRef}></canvas>
       <div id="players">
         {players.map((player, index) => (
@@ -397,6 +399,46 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
         A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi" : player.username : null))} de jouer
       </div>
       <img src="dice01.png" alt="dice" onClick={launchDice} ref={diceRef}/>
-    </>
+    </GameStyle>
   )
 }
+
+const GameStyle = styled.div`
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  img {
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+    cursor: pointer;
+  }
+
+  #whosTurn {
+    position: absolute;
+    bottom: 300px;
+    right: 50px;
+    width: 100px;
+    height: 100px;
+    background-color: red;
+  }
+
+  #players {
+    position: absolute;
+    top: 0;
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+  }
+
+  #player {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 100px;
+    width: 200px;
+  }
+`
