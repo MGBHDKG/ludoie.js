@@ -66,7 +66,7 @@ export function socketHandlers(io){
                     {
                         moveToTheNextRound(code);
                         const updatedPlayers = getRoom(code);
-                        io.to(code).emit("turnChanged", updatedPlayers);
+                        setTimeout(() => io.to(code).emit("turnChanged", updatedPlayers), 1000);
                     }
 
                     break;

@@ -16,6 +16,10 @@ export const RedButton = styled.button`
     border-radius: 40px;
     border: none;
     cursor: pointer;
+
+    &:hover {
+        background-color: #a43434;
+    }
 `
 
 export const LudoieInput = styled.input`

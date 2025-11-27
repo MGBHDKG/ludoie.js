@@ -57,7 +57,8 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
     })
 
     socket.on("turnChanged", players => {
-      setPlayers(players)
+      setPlayers(players);
+      dice.src = `dice00.png`;
     })
 
     socket.on("movablePawns", movablePawns => {
@@ -398,7 +399,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       <div id="whosTurn">
         A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi" : player.username : null))} de jouer
       </div>
-      <img src="dice01.png" alt="dice" onClick={launchDice} ref={diceRef}/>
+      <img src="dice00.png" alt="dice" onClick={launchDice} ref={diceRef}/>
     </GameStyle>
   )
 }
