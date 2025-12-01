@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import styled from "styled-components";
+import { Player, Players, Dice, WhosTurn, TurnHandler, WhosTurnWrapper, Arrow } from "./GameStyle";
 
 import { drawBoard, BOARD_POSITIONS, END_BASE_POSITIONS } from "./board";
 import {fitRendererToCanvas, cloneWithUniqueMaterials, tintObject} from './utilsTHREE';
@@ -387,59 +387,24 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
   }, [])
 
   return (
-    <GameStyle>
+    <>
       <canvas ref={canvasRef}></canvas>
-      <div id="players">
+      <Players>
         {players.map((player, index) => (
-          <div key={index} id="player" style={{backgroundColor: color[index], height: player.isPlaying ? 150 : 100}}>
+          <Player key={index} style={{backgroundColor: color[index], height: player.isPlaying ? 150 : 100}}>
             <p>{player.username === username ? "Toi" : player.username}</p>
-          </div>
+          </Player>
         ))}
-      </div>
-      <div id="whosTurn">
-        A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi" : player.username : null))} de jouer
-      </div>
-      <img src="dice00.png" alt="dice" onClick={launchDice} ref={diceRef}/>
-    </GameStyle>
+      </Players>
+      <TurnHandler>
+        <WhosTurnWrapper>
+          <WhosTurn>
+            A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi" : player.username : null))} de jouer
+          </WhosTurn>
+        </WhosTurnWrapper>
+        {players.map(player => (player.isPlaying === true ? player.username === username ? <Arrow src="arrow.png"/> : null : null))}
+        <Dice src="dice00.png" alt="dice" onClick={launchDice} ref={diceRef}/>
+      </TurnHandler>
+    </>
   )
 }
-
-const GameStyle = styled.div`
-  canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  img {
-    position: absolute;
-    right: 50px;
-    bottom: 50px;
-    cursor: pointer;
-  }
-
-  #whosTurn {
-    position: absolute;
-    bottom: 300px;
-    right: 50px;
-    width: 100px;
-    height: 100px;
-    background-color: red;
-  }
-
-  #players {
-    position: absolute;
-    top: 0;
-    display: flex;
-    justify-content: space-evenly;
-    width: 100%;
-  }
-
-  #player {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 100px;
-    width: 200px;
-  }
-`

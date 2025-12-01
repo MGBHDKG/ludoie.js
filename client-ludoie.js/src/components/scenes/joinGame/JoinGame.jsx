@@ -1,9 +1,11 @@
+import { RedButton, LudoieInput } from "../../styles/CommonStyleComponents"
+import { JoinGameStyle } from "./JoinGameStyle"
+
 export default function JoinGame({joinGame, setRoomNumber}) {
     return (
-        <>
-            <p>METTEZ LE CODE DE LA ROOM</p>
-            <input onChange={(e) => setRoomNumber(e.target.value)} id="codeRoom"></input>
-            <button onClick={joinGame} id="joinRoom">REJOINDRE LA ROOM</button>
-        </>
+        <JoinGameStyle>
+            <LudoieInput onChange={(e) => setRoomNumber(e.target.value)} id="codeRoom" placeholder="Veuillez entrer le code de la room"></LudoieInput>
+            <RedButton onClick={joinGame} id="joinRoom">REJOINDRE LA ROOM</RedButton>
+        </JoinGameStyle>
     )
 }

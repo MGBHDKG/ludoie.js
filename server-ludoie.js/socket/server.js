@@ -24,9 +24,19 @@ export function socketHandlers(io){
         socket.on("joinRoom", (username, code) => {
             let room = getRoom(code);
             if(!room) {
-                //CODE ROOM PAS PRESENTE
+                io.to(socket.id).emit("roomDoesntExist");
                 return;
             }
+            if(room.includes(username)){
+                io.to(socket.id).emit("nameAlreadyTaken");
+                return;
+            }
+            if(room.length > 4){
+                io.to(socket.id).emit("roomAlreadyFull");
+                return;
+            }
+
+            //Vérifier si game commencé
 
             room.push(username);
             setRoom(code, room);
@@ -39,6 +49,7 @@ export function socketHandlers(io){
 
         socket.on("startGame", (code) => {
             const players = setGame(code);
+            //VERIFIER SI ROOM A 4 PERSONNES
             io.to(code).emit("allStartGame", players);
         })
 

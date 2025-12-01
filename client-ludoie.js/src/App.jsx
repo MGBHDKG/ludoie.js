@@ -16,11 +16,11 @@ export default function App() {
   const [players, setPlayers] = useState([]);
 
   const joinGame = () => {
-    socket.emit("joinRoom", username, roomNumber);
+    if(username != "") socket.emit("joinRoom", username, roomNumber);
   }
 
   const createGame = () => {
-    socket.emit("createRoom", username);
+    if(username != "") socket.emit("createRoom", username);
   }
 
   const launchGame = () => {
@@ -54,7 +54,7 @@ export default function App() {
     <>
       {
         screen === "home" && (
-          <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} />
+          <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} username={username} />
         )
       }
       {
