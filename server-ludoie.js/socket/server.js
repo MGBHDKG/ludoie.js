@@ -1,5 +1,5 @@
 import {launchDice, generateSixDigitNumber} from "../game/randomGeneration.js";
-import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, setGame, moveToTheNextRound, gameIsFinished} from "../game/state.js"
+import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, setGame, moveToTheNextRound, gameIsFinished, deleteRoom} from "../game/state.js"
 import { getMovablePawns, backToBase } from "../game/pawns.js";
 
 export function socketHandlers(io){
@@ -7,6 +7,11 @@ export function socketHandlers(io){
         console.log("✅ Un client est connecté : " + socket.id);
 
         socket.on("createRoom", (username) => {
+            if(username === ""){
+                io.to(socket.id).emit("error", "Veuillez entrer un nom d'utilisateur");
+                return;
+            }
+
             var room = undefined;
 
             while(room == undefined){
@@ -16,23 +21,30 @@ export function socketHandlers(io){
 
             setRoom(room, [username]);
             socket.join(room);
+            socket.data.username = username;
+            socket.data.code = room;
 
             console.log(`Nouvelle room crée : ${room} par le joueur ${username} ayant pour id : ${socket.id}`);
             io.to(socket.id).emit("roomCreated", room, [username]);
         });
 
         socket.on("joinRoom", (username, code) => {
+            if(username === ""){
+                io.to(socket.id).emit("error", "Veuillez entrer un nom d'utilisateur");
+                return;
+            }
+
             let room = getRoom(code);
             if(!room) {
-                io.to(socket.id).emit("roomDoesntExist");
+                io.to(socket.id).emit("error", "Room " + code + " n'existe pas");
                 return;
             }
             if(room.includes(username)){
-                io.to(socket.id).emit("nameAlreadyTaken");
+                io.to(socket.id).emit("error", "Ce nom d'utilisateur est déjà pris !");
                 return;
             }
-            if(room.length > 4){
-                io.to(socket.id).emit("roomAlreadyFull");
+            if(room.length >= 4){
+                io.to(socket.id).emit("error", "La room est déjà remplie !");
                 return;
             }
 
@@ -41,10 +53,36 @@ export function socketHandlers(io){
             room.push(username);
             setRoom(code, room);
             socket.join(code);
+            socket.data.username = username;
+            socket.data.code = code;
 
             io.to(code).emit("anUserHasJoinTheRoom", room);
             console.log(`${username} a rejoint la room ${code}`);
             io.to(socket.id).emit("youCanJoinRoom", code, room);
+        })
+
+        socket.on("disconnect", () => {
+            const username = socket.data.username;
+            const code = socket.data.code;
+
+            if(!username || !code) return;
+
+            let room = getRoom(code);
+            if (!room) return;
+
+            if(typeof room[0] === "string"){
+                const players = room.filter(p => username != p);
+                if(players.length === 0){
+                    deleteRoom(code);
+                }
+                else{
+                    io.to(code).emit("userLeftRoom", players, username);
+                    setRoom(code, players);
+                }
+            }
+            else {
+
+            }
         })
 
         socket.on("startGame", (code) => {

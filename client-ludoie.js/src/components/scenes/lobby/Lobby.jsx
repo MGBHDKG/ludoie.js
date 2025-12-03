@@ -3,11 +3,17 @@ import Player from "./Player";
 import { RedButton } from "../../styles/CommonStyleComponents";
 import { LobbyStyleWrapper, LobbyStyle, LobbyPage, TextLobbyStyle } from "./LobbyStyle";
 
-export default function Lobby({roomNumber, players, launchGame}){
+export default function Lobby({roomNumber, players, launchGame, errorMessage}){
     const color = ["#ffc607", "#57cbff", "#ff0100", "#29db00"];
 
     return (
         <LobbyPage>
+            {errorMessage ? 
+                <div id="errorMessage">
+                    <img src="marque.png"/>
+                    <p>{errorMessage}</p>
+                </div> 
+            : null}
             <LobbyStyleWrapper>
                 <LobbyStyle>
                     <div>

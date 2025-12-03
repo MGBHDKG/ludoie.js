@@ -5,6 +5,7 @@ let playersTurnIndex = new Map();
 
 export function getRoom(code){ return rooms.get(code); }
 export function setRoom(code, players) { rooms.set(code, players) }
+export function deleteRoom(code){ rooms.delete(code); }
 export function roomExists(code) {return rooms.has(code); }
 
 export function getBoard(code){ return map.get(code); }

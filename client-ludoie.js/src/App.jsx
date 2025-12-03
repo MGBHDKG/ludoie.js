@@ -14,9 +14,21 @@ export default function App() {
   const [username, setUsername] = useState("");
   const [roomNumber, setRoomNumber] = useState(0);
   const [players, setPlayers] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const displayError = (message) =>{
+    setErrorMessage(message);
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 3000)
+  }
 
   const joinGame = () => {
     if(username != "") socket.emit("joinRoom", username, roomNumber);
+    else{
+
+    }
   }
 
   const createGame = () => {
@@ -25,7 +37,7 @@ export default function App() {
 
   const launchGame = () => {
     socket.emit("startGame", roomNumber);
-  }
+  };
 
   useEffect(() => {
     socket.on("roomCreated", (roomNumberGenerated, playersInRoom) => {
@@ -48,13 +60,26 @@ export default function App() {
       setPlayers(players);
       setScreen("game");
     });
+
+    socket.on("userLeftRoom", (players, username) => {
+      setErrorMessage(username + " a quitté la room");
+      setPlayers(players);
+
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 3000)
+    })
+
+    socket.on("error", message => {
+      displayError(message);
+    })
   }, []);
 
   return (
     <>
       {
         screen === "home" && (
-          <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} username={username} />
+          <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} username={username} errorMessage={errorMessage}/>
         )
       }
       {
@@ -64,12 +89,12 @@ export default function App() {
       }
       {
         screen === "lobby" && (
-          <Lobby roomNumber={roomNumber} players={players} launchGame={launchGame}/>
+          <Lobby roomNumber={roomNumber} players={players} launchGame={launchGame} errorMessage={errorMessage}/>
         )
       }
       {
         screen === "joinGame" && (
-          <JoinGame joinGame={joinGame} setRoomNumber={setRoomNumber}/>
+          <JoinGame joinGame={joinGame} setRoomNumber={setRoomNumber} errorMessage={errorMessage}/>
         )
       }
     </>

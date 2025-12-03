@@ -1,9 +1,15 @@
 import { HomeStyleWrapper, HomeStyle, AllHomeButtons } from "./HomeStyle";
 import { LudoieInput, LudoieLogo, RedButton } from "../../styles/CommonStyleComponents";
 
-export default function Home({setScreen, setUsername, createGame, username}) {
+export default function Home({setScreen, setUsername, createGame, username, errorMessage}) {
     return(
         <HomeStyleWrapper>
+            {errorMessage ? 
+                <div id="errorMessage">
+                    <img src="marque.png"/>
+                    <p>{errorMessage}</p>
+                </div> 
+            : null}
             <HomeStyle>
                 <LudoieLogo src="Logo Final.png" alt="ludoie logo"/>
                 <AllHomeButtons>
