@@ -18,7 +18,7 @@ export default function Lobby({roomNumber, players, launchGame}){
                         <Player key={index} player={player} color={color[index]} index={index+1}/>
                     ))}
                     <RedButton onClick={launchGame} id="launchGame" 
-                    // disabled={players.length !== 4}
+                        disabled={players.length !== 4}
                     >
                         LANCER LA GAME</RedButton>
                 </LobbyStyle>

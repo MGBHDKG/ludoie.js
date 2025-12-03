@@ -210,9 +210,14 @@ export function socketHandlers(io){
                 return;
             }
 
-            moveToTheNextRound(code);
-            const updatedPlayers = getRoom(code);
-            io.to(code).emit("turnChanged", updatedPlayers);
+            if(dice != 6){    
+                moveToTheNextRound(code);
+                const updatedPlayers = getRoom(code);
+                io.to(code).emit("turnChanged", updatedPlayers);
+            }
+            else{
+                player.hasRolledThisTurn = false;
+            }
         });
 
     })

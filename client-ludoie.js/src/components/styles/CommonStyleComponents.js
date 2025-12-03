@@ -20,6 +20,10 @@ export const RedButton = styled.button`
     &:hover {
         background-color: #a43434;
     }
+
+    &:disabled {
+        background-color: grey;
+    }
 `
 
 export const LudoieInput = styled.input`
