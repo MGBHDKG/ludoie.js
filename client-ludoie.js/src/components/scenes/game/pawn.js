@@ -13,15 +13,15 @@ export function drawMovablePawns(pawnsRef, movablePawns){
             }
 
             if (isMovable) {
-            // feedback visuel : par ex. blanc
-            obj.material.color.set("#FFFFFF");
-            obj.material.opacity = 1;
-            obj.material.transparent = false;
+                // feedback visuel : par ex. rose
+                obj.material.color.set("#ffffff");
+                obj.material.opacity = 1;
+                obj.material.transparent = false;
             } else {
-            // remettre la couleur du joueur
-            obj.material.color.set(pawn.userData.color);
-            obj.material.opacity = 1;
-            obj.material.transparent = false;
+                // remettre la couleur du joueur
+                obj.material.color.set(pawn.userData.color);
+                obj.material.opacity = 1;
+                obj.material.transparent = false;
             }
         });
     });

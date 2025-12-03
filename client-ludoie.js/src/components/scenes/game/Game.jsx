@@ -12,7 +12,7 @@ import { drawMovablePawns, movePawn, movePawnToBase, movePawnToEndCase, unhighli
 import { handleDice, handleDiceWithKeyboard } from "./dice";
 
 export default function Game({roomNumber, players, socket, username, setPlayers}){
-  handleDice(players, socket, username, roomNumber);
+  const launchDice = () => handleDice(players, socket, username, roomNumber);
   handleDiceWithKeyboard(players, socket, username, roomNumber);
 
   const canvasRef = useRef(null);
