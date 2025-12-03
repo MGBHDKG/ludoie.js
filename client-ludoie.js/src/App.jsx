@@ -26,13 +26,12 @@ export default function App() {
 
   const joinGame = () => {
     if(username != "") socket.emit("joinRoom", username, roomNumber);
-    else{
-
-    }
+    else displayError("Nom d'utilisateur vide");
   }
 
   const createGame = () => {
     if(username != "") socket.emit("createRoom", username);
+    else displayError("Nom d'utilisateur vide");
   }
 
   const launchGame = () => {
@@ -79,7 +78,7 @@ export default function App() {
     <>
       {
         screen === "home" && (
-          <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} username={username} errorMessage={errorMessage}/>
+          <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} username={username} errorMessage={errorMessage} displayError={displayError} />
         )
       }
       {

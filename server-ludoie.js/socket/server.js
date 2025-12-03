@@ -12,6 +12,11 @@ export function socketHandlers(io){
                 return;
             }
 
+            if(username.length > 20){
+                io.to(socket.id).emit("error", "Nom d'utilisateur trop long");
+                return;
+            }
+
             var room = undefined;
 
             while(room == undefined){
@@ -34,6 +39,11 @@ export function socketHandlers(io){
                 return;
             }
 
+            if(username.length > 20){
+                io.to(socket.id).emit("error", "Nom d'utilisateur trop long");
+                return;
+            }
+
             let room = getRoom(code);
             if(!room) {
                 io.to(socket.id).emit("error", "Room " + code + " n'existe pas");
@@ -47,8 +57,6 @@ export function socketHandlers(io){
                 io.to(socket.id).emit("error", "La room est déjà remplie !");
                 return;
             }
-
-            //Vérifier si game commencé
 
             room.push(username);
             setRoom(code, room);
@@ -81,13 +89,16 @@ export function socketHandlers(io){
                 }
             }
             else {
-
+                io.to(code).emit("endGame", "Game finie car "+ username + " a quitté la game");
             }
         })
 
         socket.on("startGame", (code) => {
+            const room = getRoom(code);
+            if(room.length != 4){
+                io.to(code).emit("error", "Nombre de joueurs incorrect");
+            }
             const players = setGame(code);
-            //VERIFIER SI ROOM A 4 PERSONNES
             io.to(code).emit("allStartGame", players);
         })
 
