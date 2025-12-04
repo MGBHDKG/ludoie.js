@@ -18,13 +18,13 @@ export default function Lobby({roomNumber, players, launchGame, errorMessage}){
                 <LobbyStyle>
                     <div>
                         <TextLobbyStyle>Room : <span id="code">{roomNumber}</span></TextLobbyStyle>
-                        <TextLobbyStyle>En attente : {players.length}/4</TextLobbyStyle>
+                        <TextLobbyStyle>En attente : {players.length} joueur(s)</TextLobbyStyle>
                     </div>
                     {players.map((player, index) => (
                         <Player key={index} player={player} color={color[index]} index={index+1}/>
                     ))}
                     <RedButton onClick={launchGame} id="launchGame" 
-                        disabled={players.length !== 4}
+                        disabled={players.length < 2}
                     >
                         LANCER LA GAME</RedButton>
                 </LobbyStyle>

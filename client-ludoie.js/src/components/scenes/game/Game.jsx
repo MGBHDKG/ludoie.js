@@ -128,22 +128,25 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
           createPion(-8, -12, "#faf703", 'C'),
           createPion(-12, -12, "#faf703", 'D'),
 
-          createPion( 8,  8, "#ff0100", 'I'),
-          createPion( 12,  8, "#ff0100", 'J'),
-          createPion( 8,  12, "#ff0100", 'K'),
-          createPion( 12,  12, "#ff0100", 'L'),
-
           createPion( 8, -8, "#57cbff", 'E'),
           createPion( 12, -8, "#57cbff", 'F'),
           createPion( 8, -12, "#57cbff", 'G'),
-          createPion( 12, -12, "#57cbff", 'H'),
-
-          createPion(-8,  8, "#29db00", 'M'),
-          createPion(-12,  8, "#29db00", 'N'),
-          createPion(-8,  12, "#29db00", 'O'),
-          createPion(-12,  12, "#29db00", 'P'),
-
+          createPion( 12, -12, "#57cbff", 'H')
         ];
+
+        if(players.length > 2){
+          tmpPawns.push(createPion( 8,  8, "#ff0100", 'I'))
+          tmpPawns.push(createPion( 12,  8, "#ff0100", 'J'))
+          tmpPawns.push(createPion( 8,  12, "#ff0100", 'K'))
+          tmpPawns.push(createPion( 12,  12, "#ff0100", 'L'))
+        }
+
+        if(players.length > 3){
+          tmpPawns.push(createPion(-8,  8, "#29db00", 'M'))
+          tmpPawns.push(createPion(-12,  8, "#29db00", 'N'))
+          tmpPawns.push(createPion(-8,  12, "#29db00", 'O'))
+          tmpPawns.push(createPion(-12,  12, "#29db00", 'P'))
+        }
 
         pawnsRef.current = tmpPawns;
     });
