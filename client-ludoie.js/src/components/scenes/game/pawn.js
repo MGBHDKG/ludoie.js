@@ -29,23 +29,20 @@ export function drawMovablePawns(pawnsRef, movablePawns){
 
 export function movePawn(pawnId, boardIndex, pawnsRef){
     // Récupérer le pion (le Group pivot) via son id
-      const pawn = pawnsRef.current.find(p => p.userData.id === pawnId);
-      if (!pawn) {
-        console.warn("Pion introuvable pour leaveBase :", pawnId);
-        return;
-      }
+    const pawn = pawnsRef.current.find(p => p.userData.id === pawnId);
+    if (!pawn) {
+      console.warn("Pion introuvable pour leaveBase :", pawnId);
+      return;
+    }
 
-      // Récupérer la position sur le plateau
-      const boardPos = BOARD_POSITIONS[boardIndex];
-      if (!boardPos) {
-        console.warn("BOARD_POSITIONS introuvable pour l'index :", boardIndex);
-        return;
-      }
+    // Récupérer la position sur le plateau
+    const boardPos = BOARD_POSITIONS[boardIndex];
+    if (!boardPos) {
+      console.warn("BOARD_POSITIONS introuvable pour l'index :", boardIndex);
+      return;
+    }
 
-      const [x, z] = boardPos;
-
-      // Déplacer le pivot du pion à cette case
-      pawn.position.set(x, 0, z);
+    const [x, z] = boardPos;
 }
 
 export function movePawnToBase(pawnId, pawnsRef){

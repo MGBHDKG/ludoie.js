@@ -53,9 +53,50 @@ export const WhosTurn = styled.div`
     color: white;
     font-size: 25px;
     font-weight: bold;
+    text-align: center;
 `
 
 export const Arrow = styled.img`
     height: 80px;
     width: auto;
+`
+export const EndGameModalWrapper = styled.div`
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0000007b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`
+
+export const EndGameModal = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50vw;
+    max-width: 500px;
+    height: 20vw;
+    max-height: 300px;
+    background-color: #c5a226;
+    border-radius: 20px;
+`
+
+export const InnerEndGameModal = styled.div`
+    height: 85%;
+    width: 85%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: column;
+    background-color: #8eb997;
+    color: white;
+`
+
+export const ModalText = styled.p`
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin: 0;
 `

@@ -1,19 +1,22 @@
-import { useEffect, useRef,  } from "react";
+import { useEffect, useRef,  useState} from "react";
 
 import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import { Player, Players, Dice, WhosTurn, TurnHandler, WhosTurnWrapper, Arrow } from "./GameStyle";
+import { Player, Players, Dice, WhosTurn, TurnHandler, WhosTurnWrapper, Arrow, EndGameModalWrapper, EndGameModal, InnerEndGameModal, ModalText } from "./GameStyle";
+import { RedButton } from "../../styles/CommonStyleComponents";
 
 import { drawBoard } from "./board";
 import {fitRendererToCanvas, cloneWithUniqueMaterials, tintObject} from './utilsTHREE';
 import { drawMovablePawns, movePawn, movePawnToBase, movePawnToEndCase, unhighlightMovablePawns } from "./pawn";
 import { handleDice, handleDiceWithKeyboard } from "./dice";
 
-export default function Game({roomNumber, players, socket, username, setPlayers}){
+export default function Game({roomNumber, players, socket, username, setPlayers, setScreen}){
   const launchDice = () => handleDice(players, socket, username, roomNumber);
   handleDiceWithKeyboard(players, socket, username, roomNumber);
+
+  const [msg, setMsg] = useState("")
 
   const canvasRef = useRef(null);
   const diceRef = useRef(null);
@@ -31,6 +34,9 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
 
     socket.on("gameIsFinished", winner => {
       alert(winner + " a gagné la game !");
+      setTimeout(() => {
+        setScreen("home");
+      }, 8000)
     })
 
     socket.on("turnChanged", players => {
@@ -57,6 +63,9 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
       movePawnToBase(pawnId, pawnsRef);
     });
 
+    socket.on("endGame", (username) => {
+      setMsg(username + " a quitté la game. Fin de game");
+    });
 
     const canvas = canvasRef.current;
     if(!canvas) return;
@@ -246,6 +255,18 @@ export default function Game({roomNumber, players, socket, username, setPlayers}
         {players.map(player => (player.isPlaying === true ? player.username === username ? <Arrow src="arrow.png"/> : null : null))}
         <Dice src="dice00.png" alt="dice" onClick={launchDice} ref={diceRef}/>
       </TurnHandler>
+      {msg != "" ? 
+        <EndGameModalWrapper>
+          <EndGameModal>
+            <InnerEndGameModal>
+              <ModalText>{msg}</ModalText>
+              <RedButton onClick={() => setScreen("home")}>Quitter la game</RedButton>
+            </InnerEndGameModal>
+          </EndGameModal>
+        </EndGameModalWrapper>
+          : 
+        null
+      }
     </>
   )
 }

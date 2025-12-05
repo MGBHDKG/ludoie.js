@@ -12,7 +12,7 @@ export function socketHandlers(io){
                 return;
             }
 
-            if(username.length > 20){
+            if(username.length > 12){
                 io.to(socket.id).emit("error", "Nom d'utilisateur trop long");
                 return;
             }
@@ -39,7 +39,7 @@ export function socketHandlers(io){
                 return;
             }
 
-            if(username.length > 20){
+            if(username.length > 12){
                 io.to(socket.id).emit("error", "Nom d'utilisateur trop long");
                 return;
             }
@@ -89,7 +89,8 @@ export function socketHandlers(io){
                 }
             }
             else {
-                io.to(code).emit("endGame", "Game finie car "+ username + " a quitté la game");
+                io.to(code).emit("endGame", username);
+                deleteRoom(code);
             }
         })
 

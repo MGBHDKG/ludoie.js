@@ -83,7 +83,7 @@ export default function App() {
       }
       {
         screen === "game" && (
-          <Game roomNumber={roomNumber} players={players} socket={socket} username={username} setPlayers={setPlayers}/>
+          <Game roomNumber={roomNumber} players={players} socket={socket} username={username} setPlayers={setPlayers} setScreen={setScreen}/>
         )
       }
       {

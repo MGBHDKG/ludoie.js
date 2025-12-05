@@ -30,6 +30,7 @@ export const LobbyStyle = styled.div`
     align-items: center;
     flex-direction: column;
     background-color: #8eb997;
+    text-align: center;
 `
 
 export const TextLobbyStyle = styled.p`
