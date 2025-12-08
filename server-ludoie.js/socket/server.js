@@ -82,10 +82,13 @@ export function socketHandlers(io){
             let room = getRoom(code);
             if (!room) return;
 
+            console.log(`${username} s'est déconnecté de la room ${room}`)
+
             if(typeof room[0] === "string"){
                 const players = room.filter(p => username != p);
                 if(players.length === 0){
                     deleteRoom(code);
+                    console.log(`Room ${code} supprimée car vide`)
                 }
                 else{
                     io.to(code).emit("userLeftRoom", players, username);
@@ -95,6 +98,7 @@ export function socketHandlers(io){
             else {
                 io.to(code).emit("endGame", username);
                 deleteRoom(code);
+                console.log(`Game de la room ${code} finie car ${username} a quitté la room`)
             }
         })
 
@@ -105,6 +109,8 @@ export function socketHandlers(io){
             }
             const players = setGame(code);
             io.to(code).emit("allStartGame", players);
+
+            console.log(`Game de la room ${code} commencée`)
         })
 
         socket.on("launchDice", (username, code, cheat) => { 
@@ -128,6 +134,7 @@ export function socketHandlers(io){
                     if(movablePawns.length > 0)
                     {
                         io.to(socket.id).emit("movablePawns", movablePawns);
+                        console.log(`Pions bougeables pour ${username} : ${movablePawns}`);
                     }
                     else
                     {
@@ -135,10 +142,12 @@ export function socketHandlers(io){
                             moveToTheNextRound(code);
                             const updatedPlayers = getRoom(code);
                             setTimeout(() => io.to(code).emit("turnChanged", updatedPlayers), 2000);
+                            console.log(`${username} n'a aucun pion bougeable, tour du prochain joueur`)
                         }
                         else{
                             player.hasRolledThisTurn = false;
                             setTimeout(() => io.to(code).emit("resetDice"), 2000); 
+                            console.log(`${username} a fait un 6, il rejoue donc`);
                         }
                     }
 
@@ -157,7 +166,7 @@ export function socketHandlers(io){
             const players = getRoom(code);
             const player = players.find(p => p.isPlaying && p.username === username);
             if(!player){
-                console.log("PawnSelected par quelqu'un qui ne joue pas");
+                console.log(`PawnSelected par ${username} qui ne joue pas`);
                 return;
             }
 
@@ -194,12 +203,14 @@ export function socketHandlers(io){
                 if(pawnOnNewPlace != -1){
                     backToBase(code, pawnOnNewPlace);
                     io.to(code).emit("backToBase", pawnOnNewPlace);
+                    console.log(`${pawnOnNewPlace} retourne à la base`);
                 }
 
                 board.map[newPlaceOnBoard] = pawnToMove;
                 setBoard(code, board);
 
                 io.to(code).emit("movePawn", pawnToMove, newPlaceOnBoard);
+                console.log(`${username}: Pion ${pawnToMove} sort de la base, à la case ${newPlaceOnBoard}`);
             }
             else{
                 let oldPlaceOnBoard = board.map.indexOf(pawnToMove);
@@ -249,6 +260,7 @@ export function socketHandlers(io){
                         if(pawnOnNewPlace != -1){
                             backToBase(code, pawnOnNewPlace);
                             io.to(code).emit("backToBase", pawnOnNewPlace);
+                            console.log(`${pawnOnNewPlace} retourne à la base`);
                         }
 
                         board.map[oldPlaceOnBoard] = -1;
@@ -256,6 +268,7 @@ export function socketHandlers(io){
                         setBoard(code, board);
 
                         io.to(code).emit("movePawn", pawnToMove, newPlaceOnBoard);
+                        console.log(`${username}: Pion ${pawnToMove} déplacé à la case ${newPlaceOnBoard}`);
                     }
                 }
             }
@@ -263,12 +276,14 @@ export function socketHandlers(io){
             // Event spécial pour les cases de fin
             if(movedToEndCase){
                 io.to(code).emit("movePawnToEndCase", pawnToMove, playerIndex, endCaseIndex);
+                console.log(`${username} : le pion ${pawnToMove} est arrivé sur les escaliers`)
             }
 
             //DETECTER FIN DE JEU
             let gameState = gameIsFinished(code);
             if(gameState.finished){
                 io.to(code).emit("gameIsFinished", players[gameState.winner].username);
+                console.log(`Game finie, ${username} a gagné`)
                 return;
             }
 
@@ -276,10 +291,12 @@ export function socketHandlers(io){
                 moveToTheNextRound(code);
                 const updatedPlayers = getRoom(code);
                 io.to(code).emit("turnChanged", updatedPlayers);
+                console.log(`${username} a joué, tour du prochain joueur`)
             }
             else{
                 player.hasRolledThisTurn = false;
                 io.to(code).emit("resetDice");
+                console.log(`${username} a fait un 6, il rejoue donc`);
             }
         });
 
