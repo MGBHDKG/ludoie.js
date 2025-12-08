@@ -118,6 +118,7 @@ export function socketHandlers(io){
                     //let dice = launchDice();
                     console.log(`Room ${code} : ${username} a fait un ${dice}`);
                     io.to(code).emit("diceLaunched", dice);
+
                     let board = getBoard(code);
                     board.dice = dice;
                     setBoard(code, board);
@@ -130,9 +131,15 @@ export function socketHandlers(io){
                     }
                     else
                     {
-                        moveToTheNextRound(code);
-                        const updatedPlayers = getRoom(code);
-                        setTimeout(() => io.to(code).emit("turnChanged", updatedPlayers), 1000);
+                        if(dice != 6){
+                            moveToTheNextRound(code);
+                            const updatedPlayers = getRoom(code);
+                            setTimeout(() => io.to(code).emit("turnChanged", updatedPlayers), 2000);
+                        }
+                        else{
+                            player.hasRolledThisTurn = false;
+                            setTimeout(() => io.to(code).emit("resetDice"), 2000); 
+                        }
                     }
 
                     break;
@@ -150,7 +157,7 @@ export function socketHandlers(io){
             const players = getRoom(code);
             const player = players.find(p => p.isPlaying && p.username === username);
             if(!player){
-                console.log("Cheat / désync : pawnSelected par quelqu'un qui ne joue pas");
+                console.log("PawnSelected par quelqu'un qui ne joue pas");
                 return;
             }
 

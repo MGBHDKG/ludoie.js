@@ -1,10 +1,9 @@
-import { HomeStyleWrapper, HomeStyle, AllHomeButtons } from "./HomeStyle";
+import { HomeStyle, AllHomeButtons } from "./HomeStyle";
 import { LudoieInput, LudoieLogo, RedButton } from "../../styles/CommonStyleComponents";
 
 export default function Home({setScreen, setUsername, createGame, username, errorMessage, displayError}) {
     return(
-        <HomeStyleWrapper>
-            <HomeStyle>
+        <HomeStyle>
                 {errorMessage ? 
                     <div id="errorMessage">
                         <img src="marque.png"/>
@@ -18,7 +17,6 @@ export default function Home({setScreen, setUsername, createGame, username, erro
                     <RedButton onClick={() => {if(username != "") setScreen("joinGame"); else displayError("Nom d'utilisateur vide"); }} id="joinGame">Rejoindre une partie</RedButton>
                     <RedButton onClick={() => {alert("PAGE EN TRAVAUX")}}>Règles du jeu</RedButton>
                 </AllHomeButtons>
-            </HomeStyle>
-        </HomeStyleWrapper>
+        </HomeStyle>
     )
 } 

@@ -14,6 +14,7 @@ import { handleDice, handleDiceWithKeyboard } from "./dice";
 
 export default function Game({roomNumber, players, socket, username, setPlayers, setScreen}){
   const launchDice = () => handleDice(players, socket, username, roomNumber);
+  handleDiceWithKeyboard(players, socket, username, roomNumber);
 
   const [msg, setMsg] = useState("")
 
