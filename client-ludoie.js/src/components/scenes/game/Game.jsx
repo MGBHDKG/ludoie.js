@@ -14,7 +14,6 @@ import { handleDice, handleDiceWithKeyboard } from "./dice";
 
 export default function Game({roomNumber, players, socket, username, setPlayers, setScreen}){
   const launchDice = () => handleDice(players, socket, username, roomNumber);
-  handleDiceWithKeyboard(players, socket, username, roomNumber);
 
   const [msg, setMsg] = useState("")
 
@@ -66,6 +65,10 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
     socket.on("endGame", (username) => {
       setMsg(username + " a quitté la game. Fin de game");
     });
+
+    socket.on("resetDice", () => {
+      dice.src = `dice00.png`;
+    })
 
     const canvas = canvasRef.current;
     if(!canvas) return;

@@ -7,7 +7,8 @@ import JoinGame from "./components/scenes/joinGame/JoinGame";
 
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:4000");
+const socket = io("https://api.wfun.games");
+//const socket = io("http://localhost:4000")
 
 export default function App() {
   const [screen, setScreen] = useState("home");

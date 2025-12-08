@@ -111,6 +111,7 @@ export function socketHandlers(io){
                     player.hasRolledThisTurn = true;
 
                     let dice = cheat === null ? launchDice() : cheat;
+                    //let dice = launchDice();
                     console.log(`Room ${code} : ${username} a fait un ${dice}`);
                     io.to(code).emit("diceLaunched", dice);
                     let board = getBoard(code);
@@ -267,6 +268,7 @@ export function socketHandlers(io){
             }
             else{
                 player.hasRolledThisTurn = false;
+                io.to(code).emit("resetDice");
             }
         });
 

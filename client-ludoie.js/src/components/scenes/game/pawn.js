@@ -43,6 +43,7 @@ export function movePawn(pawnId, boardIndex, pawnsRef){
     }
 
     const [x, z] = boardPos;
+    pawn.position.set(x, 0, z);
 }
 
 export function movePawnToBase(pawnId, pawnsRef){

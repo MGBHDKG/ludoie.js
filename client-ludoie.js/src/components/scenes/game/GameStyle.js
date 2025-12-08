@@ -9,6 +9,7 @@ export const TurnHandler = styled.div`
     right: 0;
     bottom: 0;
     width: 20vw;
+    min-width: 300px;
     height: 50vh;
 `
 
@@ -33,13 +34,16 @@ export const WhosTurnWrapper = styled.div`
     justify-content: center;
     align-items: center;
     width: 300px;
-    height: 180px;
+    height: 20vh;
+    max-height: 180px;
     background-color: #c5a226;
     border-radius: 20px;
 `
 
 export const Dice = styled.img`
     cursor: pointer;
+    width: 10vw;
+    max-width: 128px;
 `
 
 export const WhosTurn = styled.div`
@@ -57,7 +61,8 @@ export const WhosTurn = styled.div`
 `
 
 export const Arrow = styled.img`
-    height: 80px;
+    height: 10vh;
+    max-height: 80px;
     width: auto;
 `
 export const EndGameModalWrapper = styled.div`
