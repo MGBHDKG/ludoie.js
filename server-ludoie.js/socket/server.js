@@ -57,6 +57,10 @@ export function socketHandlers(io){
                 io.to(socket.id).emit("error", "La room est déjà remplie !");
                 return;
             }
+            if(typeof room[0] !== "string"){
+                io.to(socket.id).emit("error", "Cette room est déjà en partie");
+                return;
+            }
 
             room.push(username);
             setRoom(code, room);
