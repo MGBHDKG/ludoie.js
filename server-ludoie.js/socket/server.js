@@ -1,27 +1,26 @@
-import {launchDice, generateSixDigitNumber} from "../game/randomGeneration.js";
-import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, setGame, moveToTheNextRound, gameIsFinished, deleteRoom} from "../game/state.js"
+import {launchDice, generateRoomNumber} from "../game/randomGeneration.js";
+import {getRoom, getBoard, getBase, roomExists, setBase, setBoard, setRoom, startGame, moveToTheNextRound, isGameFinished, deleteRoom} from "../game/state.js"
 import { getMovablePawns, backToBase } from "../game/pawns.js";
+import { Player } from "../model/player.js";
 
 export function socketHandlers(io){
     io.on("connection", (socket) => {
         console.log("✅ Un client est connecté : " + socket.id);
 
         socket.on("createRoom", (username) => {
-            if(username === ""){
-                io.to(socket.id).emit("error", "Veuillez entrer un nom d'utilisateur");
-                return;
-            }
+            let checkUsername = Player.checkUsername(username);
 
-            if(username.length > 12){
-                io.to(socket.id).emit("error", "Nom d'utilisateur trop long");
+            if(checkUsername.valid === false){
+                io.to(socket.id).emit("error", checkUsername.error);
+                console.log(`Erreur : ${username} : ${checkUsername.error}`);
                 return;
             }
 
             var room = undefined;
 
             while(room == undefined){
-                room = generateSixDigitNumber();
-                if(roomExists(room)) room = undefined
+                room = generateRoomNumber();
+                if(roomExists(room)) room = undefined;
             }
 
             setRoom(room, [username]);
@@ -34,13 +33,11 @@ export function socketHandlers(io){
         });
 
         socket.on("joinRoom", (username, code) => {
-            if(username === ""){
-                io.to(socket.id).emit("error", "Veuillez entrer un nom d'utilisateur");
-                return;
-            }
+            let checkUsername = Player.checkUsername(username);
 
-            if(username.length > 12){
-                io.to(socket.id).emit("error", "Nom d'utilisateur trop long");
+            if(checkUsername.valid === false){
+                io.to(socket.id).emit("error", checkUsername.error);
+                console.log(`Erreur : ${username} : ${checkUsername.error}`);
                 return;
             }
 
@@ -82,7 +79,7 @@ export function socketHandlers(io){
             let room = getRoom(code);
             if (!room) return;
 
-            console.log(`${username} s'est déconnecté de la room ${room}`)
+            console.log(`${username} s'est déconnecté de la room ${code}`)
 
             if(typeof room[0] === "string"){
                 const players = room.filter(p => username != p);
@@ -107,7 +104,7 @@ export function socketHandlers(io){
             if(room.length != 4){
                 io.to(code).emit("error", "Nombre de joueurs incorrect");
             }
-            const players = setGame(code);
+            const players = startGame(code);
             io.to(code).emit("allStartGame", players);
 
             console.log(`Game de la room ${code} commencée`)
@@ -153,9 +150,7 @@ export function socketHandlers(io){
 
                     break;
                 }
-                else{
-                    //TENTATIVE DE TRICHE
-                }
+                else{/*TENTATIVE DE TRICHE*/}
             }
         })
 
@@ -280,9 +275,9 @@ export function socketHandlers(io){
             }
 
             //DETECTER FIN DE JEU
-            let gameState = gameIsFinished(code);
+            let gameState = isGameFinished(code);
             if(gameState.finished){
-                io.to(code).emit("gameIsFinished", players[gameState.winner].username);
+                io.to(code).emit("isGameFinished", players[gameState.winner].username);
                 console.log(`Game finie, ${username} a gagné`)
                 return;
             }
@@ -299,6 +294,5 @@ export function socketHandlers(io){
                 console.log(`${username} a fait un 6, il rejoue donc`);
             }
         });
-
     })
 }

@@ -1,3 +1,5 @@
+import { Player } from "../model/player.js";
+
 let rooms = new Map();
 let map = new Map();
 let base = new Map();
@@ -17,20 +19,14 @@ export function setBase(code, newBase){ base.set(code, newBase); }
 export function getTurnIndex(code){ return playersTurnIndex.get(code); }
 export function setTurnIndex(code, index) { playersTurnIndex.set(code, index); }
 
-export function setGame(code){
+export function startGame(code){
     let room = getRoom(code);
     let players = [];
 
     for(let i=0; i<room.length; i++){
-        players[i] = {
-            username: room[i],
-            isPlaying: false, 
-            index: i,
-            hasRolledThisTurn: false,
-        }
+        players[i] = new Player(room[i], i);
     }
-    players[0].isPlaying = true;
-    players[0].hasRolledThisTurn = false;
+    players[0].turnStart();
 
     setRoom(code, players);
     setTurnIndex(code, 0);
@@ -87,7 +83,6 @@ export function setGame(code){
     return players;
 }
 
-
 export function moveToTheNextRound(code){
     let players = getRoom(code);
     let index = getTurnIndex(code);
@@ -103,7 +98,7 @@ export function moveToTheNextRound(code){
     setTurnIndex(code, nextPlayer);
 }
 
-export function gameIsFinished(code){
+export function isGameFinished(code){
     const board = getBoard(code);
     const endCases = board.endCases;
 
