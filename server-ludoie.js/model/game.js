@@ -9,7 +9,7 @@ export class Game{
         ['I','J','K','L'],
         ['M','N','O','P']
     ];
-    #endCases = [
+    #stairs = [
         [-1,-1,-1,-1],
         [-1,-1,-1,-1],
         [-1,-1,-1,-1],
@@ -40,6 +40,69 @@ export class Game{
         return pawnsNotInBase;
     }
 
+    #getPawnMove(pawn, dice, playerNumber){
+        const home = this.#homes[playerNumber];
+        const startCaseIndex = START_INDEX[playerNumber];
+        const startCase = this.#board[startCaseIndex];
+        const pawnsOfThePlayer = INITIAL_PAWNS[playerNumber];
+
+        if(home.includes(pawn)){
+            if(dice === 5 && this.#canLeaveBase(pawnsOfThePlayer, startCase)){
+                return {
+                    from: "base",
+                    to: "board",
+                    index: startCaseIndex,
+                    capturedPawn: startCase !== -1 ? startCase : null
+                }
+            }
+            return null;
+        }
+
+        if(this.#pawnInEndCases(pawn)){
+            const indexOfPawn = this.#stairs[playerNumber].indexOf(pawn);
+            const stairsOfThePlayer = this.#stairs[playerNumber]
+            const targetCaseIndex = indexOfPawn + dice;
+            if(targetCaseIndex < 4 && stairsOfThePlayer[targetCaseIndex] === -1){
+                return {
+                    from : "end",
+                    to : "end",
+                    index : indexOfPawn + dice
+                }
+            }
+            return null;
+        }
+
+        const oldPlaceOnBoardIndex = this.#board.indexOf(pawn);
+        const exit = END_INDEX[playerNumber];
+        const distanceToExit = exit - oldPlaceOnBoardIndex;
+
+        if(distanceToExit >= 0 && dice > distanceToExit){
+            const stepsToFirstEndCase = distanceToExit + 1;
+            if(dice != stepsToFirstEndCase) return null;
+
+            const stairsOfThePlayer = this.#stairs[playerNumber];
+            if(stairsOfThePlayer[0] !== -1) return null;
+            
+            return {
+                from : "board",
+                to : "end"
+            }
+        }
+
+        const pawnsNotInBase = this.#findPawnsNotInBase(playerNumber);
+        const newPlaceOnBoardIndex = (oldPlaceOnBoardIndex + dice) % BOARD_SIZE;
+        const targetCase = this.#board[newPlaceOnBoardIndex];
+
+        if(pawnsNotInBase.includes(targetCase)) return null;
+
+        return {
+            from : "board",
+            to : "board",
+            index : newPlaceOnBoardIndex,
+            capturedPawn : targetCase === -1 ? targetCase : null
+        }
+    }
+
     launchDice(username, cheat){
         for(const player of this.#players){
             if(player.isPlaying() && player.username() === username && !player.hasRolledThisTurn()){
@@ -51,59 +114,20 @@ export class Game{
         }
     }
 
-    getMovablePawns(player, dice){
+    getMovablePawns(player){
         let movablePawns = [];
         const playerNumber = player.getPlayerNumber();
-
-        const startIndexOfThePlayer = START_INDEX[playerNumber];
-        const startCase = this.#board[startIndexOfThePlayer];
-
+        const dice = this.#dice;
         const pawnsOfThePlayer = INITIAL_PAWNS[playerNumber];
-
-        if(dice === 5 && this.#canLeaveBase(pawnsOfThePlayer, startCase)){
-            for(const pawn of this.#homes[playerNumber]){
-                if(pawn != -1) movablePawns.push(pawn);
-            }
-        }
-
-        const pawnsNotInBase = this.#findPawnsNotInBase(playerNumber);
-
-        for(const pawn of pawnsNotInBase){
-            if(this.#pawnInEndCases(pawn)){
-                const endCase = this.#endCases[playerNumber];
-                const indexOfThePlayerInEndCases = endCase.indexOf(pawn);
-                const targetIndexInEndCases = indexOfThePlayerInEndCases + dice;
-
-                if(targetIndexInEndCases < endCase.length && endCase[targetIndexInEndCases] === -1) movablePawns.push(pawn);
-                continue;
-            }
-
-            const oldPlaceOnBoardIndex = this.#board.indexOf(pawn);
-
-            const exit = END_INDEX[playerNumber];
-            const distanceToExit = exit - oldPlaceOnBoardIndex;
-
-            // Cas où on sort vers les cases finales
-            if(distanceToExit >= 0 && dice > distanceToExit){
-                const endCaseIndex = this.#endCases[playerNumber];
-                const stepsToFirstEndCase = distanceToExit + 1;
-                const indexInEndCases = dice - stepsToFirstEndCase;
-
-                if(indexInEndCases < 0 || indexInEndCases >= endCaseIndex.length) continue;
-                if(endCaseIndex[indexInEndCases] !== -1) continue;
-
-                movablePawns.push(pawn);
-                continue;
-            }
-            const newPlaceOnBoardIndex = (oldPlaceOnBoardIndex + dice) % BOARD_SIZE;
-            const targetCase = this.#board[newPlaceOnBoardIndex];
-
-            if(pawnsNotInBase.includes(targetCase)) continue;
-
-            movablePawns.push(pawn);
+        for(const pawn of pawnsOfThePlayer){
+            if(this.#getPawnMove(pawn, dice, playerNumber)) movablePawns.push(pawn);
         }
 
         return movablePawns;
+    }
+
+    movePawn(pawnToMove){
+        
     }
 
     backPawnToBase(pawnToEject){
