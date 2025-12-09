@@ -42,8 +42,6 @@ export function startGame(code){
             -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
         ],
 
-        dice: 0,
-
         endIndex : {
             0: 47,
             1: 11,
@@ -79,20 +77,18 @@ export function startGame(code){
         ['I','J','K','L'],
         ['M','N','O','P']
     ]);
-
-    return players;
 }
 
 export function moveToTheNextRound(code){
     let players = getRoom(code);
     let index = getTurnIndex(code);
 
-    players[index].isPlaying = false;
-    players[index].hasRolledThisTurn = false;
+    players[index].turnEnd();
+    players[index].resetRollThisTurn();
 
     let nextPlayer = (index + 1) % players.length;
-    players[nextPlayer].isPlaying = true;
-    players[nextPlayer].hasRolledThisTurn = false;
+    players[nextPlayer].turnStart();
+    players[nextPlayer].resetRollThisTurn();
 
     setRoom(code, players);
     setTurnIndex(code, nextPlayer);

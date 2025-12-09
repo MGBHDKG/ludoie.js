@@ -5,11 +5,12 @@ export function getMovablePawns(player, dice, code){
     let bases = getBase(code);
     let movablePawns = [];
     const boardLength = board.map.length;
+    const playerNumber = player.getPlayerNumber();
 
-    const startIndex = board.startIndex[player.index];
+    const startIndex = board.startIndex[playerNumber];
     const startCase = board.map[startIndex];
 
-    const pawnsOfThePlayer = board.pawns[player.index];
+    const pawnsOfThePlayer = board.pawns[playerNumber];
 
     const isStartCaseFree = (
         startCase === -1 ||
@@ -18,14 +19,14 @@ export function getMovablePawns(player, dice, code){
 
     // Pions en base qui peuvent sortir sur un 5
     if(dice === 5 && isStartCaseFree){
-        for(const pawn of bases[player.index]){
+        for(const pawn of bases[playerNumber]){
             if(pawn != -1) movablePawns.push(pawn);
         }
     }
 
     // Pions du joueur qui ne sont plus en base
-    let pawnsNotInBase = [...board.pawns[player.index]];
-    const base = bases[player.index];
+    let pawnsNotInBase = [...board.pawns[playerNumber]];
+    const base = bases[playerNumber];
     for(const pawn of base){
         if(pawn != -1) pawnsNotInBase = pawnsNotInBase.filter(p => p != pawn);
     }
@@ -35,7 +36,7 @@ export function getMovablePawns(player, dice, code){
 
         // Déjà dans les cases finales
         if(oldPlaceOnBoard === -1){
-            const endCase = board.endCases[player.index];
+            const endCase = board.endCases[playerNumber];
             const indexOfThePlayerInEndCases = endCase.indexOf(pawn);
             const targetIndexInEndCases = indexOfThePlayerInEndCases + dice;
 
@@ -49,12 +50,12 @@ export function getMovablePawns(player, dice, code){
         }
 
         // Encore sur le plateau
-        const exit = board.endIndex[player.index];
+        const exit = board.endIndex[playerNumber];
         const distanceToExit = exit - oldPlaceOnBoard;
 
         // Cas où on sort vers les cases finales
         if(distanceToExit >= 0 && dice > distanceToExit){
-            const endCase = board.endCases[player.index];
+            const endCase = board.endCases[playerNumber];
             const stepsToFirstEndCase = distanceToExit + 1;
             const indexInEndCases = dice - stepsToFirstEndCase; // 0..3
 

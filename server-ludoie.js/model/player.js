@@ -1,12 +1,12 @@
 export class Player {
     #username;
-    #id;
+    #playerNumber;
     #isPlaying = false;
     #hasRolledThisTurn = false;
 
-    constructor(username, id){
+    constructor(username, playerNumber){
         this.#username = username;
-        this.#id = id;
+        this.#playerNumber = playerNumber;
     }
 
     isPlaying(){ return this.#isPlaying; }
@@ -17,6 +17,10 @@ export class Player {
 
     resetRollThisTurn() { this.#hasRolledThisTurn = false;}
     markRolledThisTurn(){ this.#hasRolledThisTurn = true; }
+
+    username(){ return this.#username; }
+
+    getPlayerNumber(){ return this.#playerNumber; }
 
     static checkUsername(username){
         if(typeof username !== "string") return {valid: false, error: "Le nom d'utilisateur doit être un string"};
@@ -29,7 +33,7 @@ export class Player {
         return {
             username: this.#username,
             isPlaying: this.#isPlaying, 
-            index: this.#id,
+            index: this.#playerNumber,
             hasRolledThisTurn: this.#hasRolledThisTurn
         }
     }

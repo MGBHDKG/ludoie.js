@@ -95,17 +95,21 @@ export function socketHandlers(io){
             else {
                 io.to(code).emit("endGame", username);
                 deleteRoom(code);
+                //IL FAUT DELETE LE BOARD ET TOUT
                 console.log(`Game de la room ${code} finie car ${username} a quitté la room`)
             }
         })
 
         socket.on("startGame", (code) => {
             const room = getRoom(code);
-            if(room.length != 4){
+            if(room.length < 2 || room.length > 4){
                 io.to(code).emit("error", "Nombre de joueurs incorrect");
+                return;
             }
-            const players = startGame(code);
-            io.to(code).emit("allStartGame", players);
+            startGame(code);
+            const players = getRoom(code);
+            const playersObj = players.map(p => p.convertPlayerToObj());
+            io.to(code).emit("allStartGame", playersObj);
 
             console.log(`Game de la room ${code} commencée`)
         })
@@ -114,8 +118,8 @@ export function socketHandlers(io){
             let players = getRoom(code);
 
             for(const player of players){
-                if(player.isPlaying && player.username === username && !player.hasRolledThisTurn){
-                    player.hasRolledThisTurn = true;
+                if(player.isPlaying() && player.username() === username && !player.hasRolledThisTurn()){
+                    player.markRolledThisTurn();
 
                     let dice = cheat === null ? launchDice() : cheat;
                     //let dice = launchDice();
@@ -131,6 +135,8 @@ export function socketHandlers(io){
                     if(movablePawns.length > 0)
                     {
                         io.to(socket.id).emit("movablePawns", movablePawns);
+                        board.movablePawns = movablePawns;
+                        setBoard(code, board);
                         console.log(`Pions bougeables pour ${username} : ${movablePawns}`);
                     }
                     else
@@ -138,11 +144,12 @@ export function socketHandlers(io){
                         if(dice != 6){
                             moveToTheNextRound(code);
                             const updatedPlayers = getRoom(code);
-                            setTimeout(() => io.to(code).emit("turnChanged", updatedPlayers), 2000);
+                            const updatedPlayersObj = updatedPlayers.map(p => p.convertPlayerToObj());
+                            setTimeout(() => io.to(code).emit("turnChanged", updatedPlayersObj), 2000);
                             console.log(`${username} n'a aucun pion bougeable, tour du prochain joueur`)
                         }
                         else{
-                            player.hasRolledThisTurn = false;
+                            player.resetRollThisTurn()
                             setTimeout(() => io.to(code).emit("resetDice"), 2000); 
                             console.log(`${username} a fait un 6, il rejoue donc`);
                         }
@@ -150,22 +157,27 @@ export function socketHandlers(io){
 
                     break;
                 }
-                else{/*TENTATIVE DE TRICHE*/}
             }
         })
 
         socket.on("pawnSelected", (pawnToMove, code, username) => {
-            //VERIFIER SI C BIEN LE TOUR ET BIEN UN PION DEPLACABLE
             let board = getBoard(code);
+            const movablePawns = board.movablePawns;
+            if(!movablePawns.includes(pawnToMove)){
+                //Tentative de triche : déplacement d'un pion non déplaçable
+                console.log(`Tentative de triche : ${username} essaye de bouger le pion ${pawnToMove}`);
+                return;
+            }
+
             const dice = board.dice;
             const players = getRoom(code);
-            const player = players.find(p => p.isPlaying && p.username === username);
+            const player = players.find(p => p.isPlaying() && p.username() === username);
             if(!player){
                 console.log(`PawnSelected par ${username} qui ne joue pas`);
                 return;
             }
 
-            const playerIndex = player.index;
+            const playerIndex = player.getPlayerNumber();
             const bases = getBase(code);
             const playerBase = bases[playerIndex];
 
@@ -277,7 +289,7 @@ export function socketHandlers(io){
             //DETECTER FIN DE JEU
             let gameState = isGameFinished(code);
             if(gameState.finished){
-                io.to(code).emit("isGameFinished", players[gameState.winner].username);
+                io.to(code).emit("isGameFinished", players[gameState.winner].username());
                 console.log(`Game finie, ${username} a gagné`)
                 return;
             }
@@ -285,11 +297,13 @@ export function socketHandlers(io){
             if(dice != 6){    
                 moveToTheNextRound(code);
                 const updatedPlayers = getRoom(code);
-                io.to(code).emit("turnChanged", updatedPlayers);
+                const updatedPlayersObj = updatedPlayers.map(p => p.convertPlayerToObj());
+                
+                io.to(code).emit("turnChanged", updatedPlayersObj);
                 console.log(`${username} a joué, tour du prochain joueur`)
             }
             else{
-                player.hasRolledThisTurn = false;
+                player.resetRollThisTurn();
                 io.to(code).emit("resetDice");
                 console.log(`${username} a fait un 6, il rejoue donc`);
             }
