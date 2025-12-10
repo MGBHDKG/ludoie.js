@@ -1,5 +1,5 @@
-import { BOARD_SIZE, INITIAL_PAWNS, START_INDEX, END_INDEX } from "../constant/gameParameters";
-import { launchDice } from "../game/randomGeneration";
+import { BOARD_SIZE, INITIAL_PAWNS, START_INDEX, END_INDEX } from "../constant/gameParameters.js";
+import { launchDice } from "../game/randomGeneration.js";
 
 export class Game{
     #board = Array(BOARD_SIZE).fill(-1);
@@ -16,6 +16,7 @@ export class Game{
         [-1,-1,-1,-1],
     ]
     #players;
+    #movablePawns;
     #playerWhoIsPlayingIndex = 0;
     #dice;
     #numberOfTotalRound = 0;
@@ -90,6 +91,7 @@ export class Game{
                 from : "board",
                 to : "end",
                 oldPlaceOnBoardIndex : oldPlaceOnBoardIndex,
+                newPlaceOnBoardIndex: 0,
                 capturedPawn : null
             }
         }
@@ -119,10 +121,22 @@ export class Game{
         this.#board = this.#board.map(p => p === pawnToEject ? -1 : p)
     }
 
+    startGame(){
+        this.#players[0].turnStart();
+    }
+
+    getDice(){ return this.#dice; }
+
+    setMovablePawns(movablePawns){ this.#movablePawns = movablePawns; }
+
+    getMovablePawns(){ return this.#movablePawns; }
+
     getPlayerWhoIsPlaying(){
         const playerWhoIsPlaying = this.#players.find(p => p.isPlaying()) ?? null;
         return playerWhoIsPlaying;
     }
+
+    getPlayers(){ return this.#players; }
 
     moveToTheNextTurn(){
         const playerWhoIsPlayingIndex = this.#playerWhoIsPlayingIndex;
@@ -159,7 +173,7 @@ export class Game{
         }
     }
 
-    getMovablePawns(player){
+    computeMovablePawns(player){
         let movablePawns = [];
         const playerNumber = player.getPlayerNumber();
         const dice = this.#dice;
@@ -174,7 +188,7 @@ export class Game{
     movePawn(pawnToMove, playerNumber){
         const dice = this.#dice;
         const moveOfThePawn = this.#getPawnMove(pawnToMove, dice, playerNumber);
-        if(!moveOfThePawn) return;
+        if(!moveOfThePawn) return null;
 
         switch (moveOfThePawn.from)
         {

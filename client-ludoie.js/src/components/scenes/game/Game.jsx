@@ -246,14 +246,14 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
       <Players>
         {players.map((player, index) => (
           <Player key={index} style={{backgroundColor: color[index], height: player.isPlaying ? 150 : 100}}>
-            <p>{player.username === username ? "Toi" : player.username}</p>
+            <p>{player.username === username ? "Toi (" + player.username + ")" : player.username}</p>
           </Player>
         ))}
       </Players>
       <TurnHandler>
         <WhosTurnWrapper>
           <WhosTurn>
-            A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi" : player.username : null))} de jouer
+            A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi"  : player.username : null))} de jouer
           </WhosTurn>
         </WhosTurnWrapper>
         {players.map(player => (player.isPlaying === true ? player.username === username ? <Arrow src="arrow.png"/> : null : null))}
