@@ -153,10 +153,27 @@ export class Game{
         if(nextPlayerIndex === 0) this.#numberOfTotalRound++;
     }
 
+    computeRanking(){
+        let playersRanking = [];
+
+        for(let i = 0; i<this.#numberOfPlayers; i++){
+            const score = this.#stairs[i].reduce((sum, v) => sum + (v !== -1 ? 1 : 0), 0);
+            playersRanking.push({
+                username: this.#players[i].username(),
+                score: score,
+            })
+        }
+        playersRanking.sort((a,b) => a.score - b.score);
+        return playersRanking;
+    }
+
     isGameFinished(){
         for(let i=0; i<this.#numberOfPlayers; i++){
             const isEndCaseFull = !this.#stairs[i].includes(-1);
-            if(isEndCaseFull) return {finished: true, winner: i};
+            if(isEndCaseFull){
+                const playersRanking = this.computeRanking();
+                return {finished: true, playersRanking: playersRanking};
+            }
         }
 
         return {finished: false}

@@ -2,6 +2,7 @@ import {generateRoomNumber} from "../game/randomGeneration.js";
 import {getRoom, roomExists, setRoom,  deleteRoom, getGame, setGame, deleteGame} from "../game/roomAndGameStructures.js";
 import { Player } from "../model/player.js";
 import { Game } from "../model/game.js";
+import { playerStatistics } from "../model/playerStatistics.js" 
 
 export function socketHandlers(io){
     io.on("connection", (socket) => {
@@ -88,7 +89,7 @@ export function socketHandlers(io){
                 }
             }
             else {
-                io.to(code).emit("endGame", username);
+                io.to(code).emit("endGameAFK", username);
                 deleteGame(code);
                 console.log(`Game de la room ${code} finie car ${username} a quitté la room`);
             }
@@ -103,7 +104,8 @@ export function socketHandlers(io){
 
             let players = [];
             for(let i=0; i<room.length; i++){
-                players[i] = new Player(room[i], i);
+                const stats =  new playerStatistics();
+                players[i] = new Player(room[i], i, stats);
             }
 
             deleteRoom(code);
@@ -188,8 +190,10 @@ export function socketHandlers(io){
 
             let gameState = game.isGameFinished();
             if(gameState.finished){
-                io.to(code).emit("gameIsFinished", players[gameState.winner].username());
-                console.log(`Game finie, ${username} a gagné`)
+                setTimeout(() => {
+                    io.to(code).emit("gameIsFinished", gameState.playersRanking);
+                }, 2000);
+                console.log(`Game finie, voici le classement : ${gameState.playersRanking}`);
                 return;
             }
 

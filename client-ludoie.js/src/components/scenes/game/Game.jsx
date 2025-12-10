@@ -34,6 +34,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
 
     socket.on("gameIsFinished", winner => {
       alert(winner + " a gagné la game !");
+      console.log(winner);
       setTimeout(() => {
         setScreen("home");
       }, 8000)
@@ -63,7 +64,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
       movePawnToBase(pawnId, pawnsRef);
     });
 
-    socket.on("endGame", (username) => {
+    socket.on("endGameAFK", (username) => {
       setMsg(username + " a quitté la game. Fin de game");
     });
 

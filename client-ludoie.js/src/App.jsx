@@ -4,6 +4,7 @@ import Game from "./components/scenes/game/Game";
 import Home from "./components/scenes/home/Home";
 import Lobby from "./components/scenes/lobby/Lobby";
 import JoinGame from "./components/scenes/joinGame/JoinGame";
+import EndGame from "./components/scenes/endGame/EndGame";
 
 import { io } from "socket.io-client";
 
@@ -95,6 +96,11 @@ export default function App() {
       {
         screen === "joinGame" && (
           <JoinGame joinGame={joinGame} setRoomNumber={setRoomNumber} errorMessage={errorMessage}/>
+        )
+      }
+      {
+        screen === "endGame" && (
+          <EndGame />
         )
       }
     </>
