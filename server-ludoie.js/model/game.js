@@ -16,20 +16,21 @@ export class Game{
         [-1,-1,-1,-1],
     ]
     #players;
-    #turnIndex = 0;
+    #playerWhoIsPlayingIndex = 0;
     #dice;
-    #numberOfTotalRound;
+    #numberOfTotalRound = 0;
     #numberOfPlayers;
 
     constructor(players){
         this.#players = players;
+        this.#numberOfPlayers = players.length;
     }
 
-    #canLeaveBase(pawnsOfThePlayer, startCase){
+    #canPawnLeaveBase(pawnsOfThePlayer, startCase){
         return startCase === -1 || !pawnsOfThePlayer.includes(startCase)
     }
 
-    #pawnInEndCases(pawn){ return this.#board.indexOf(pawn) === -1 }
+    #isPawnInStairs(pawn, playerNumber){ return this.#stairs[playerNumber].includes(pawn) }
 
     #findPawnsNotInBase(playerNumber){
         let pawnsNotInBase = INITIAL_PAWNS[playerNumber];
@@ -47,18 +48,18 @@ export class Game{
         const pawnsOfThePlayer = INITIAL_PAWNS[playerNumber];
 
         if(home.includes(pawn)){
-            if(dice === 5 && this.#canLeaveBase(pawnsOfThePlayer, startCase)){
+            if(dice === 5 && this.#canPawnLeaveBase(pawnsOfThePlayer, startCase)){
                 return {
                     from: "base",
                     to: "board",
-                    index: startCaseIndex,
+                    newPlaceOnBoardIndex: startCaseIndex,
                     capturedPawn: startCase !== -1 ? startCase : null
                 }
             }
             return null;
         }
 
-        if(this.#pawnInEndCases(pawn)){
+        if(this.#isPawnInStairs(pawn, playerNumber)){
             const indexOfPawn = this.#stairs[playerNumber].indexOf(pawn);
             const stairsOfThePlayer = this.#stairs[playerNumber]
             const targetCaseIndex = indexOfPawn + dice;
@@ -66,7 +67,9 @@ export class Game{
                 return {
                     from : "end",
                     to : "end",
-                    index : indexOfPawn + dice
+                    oldPlaceOnBoardIndex: indexOfPawn,
+                    newPlaceOnBoardIndex : indexOfPawn + dice,
+                    capturedPawn: null
                 }
             }
             return null;
@@ -85,7 +88,9 @@ export class Game{
             
             return {
                 from : "board",
-                to : "end"
+                to : "end",
+                oldPlaceOnBoardIndex : oldPlaceOnBoardIndex,
+                capturedPawn : null
             }
         }
 
@@ -98,16 +103,56 @@ export class Game{
         return {
             from : "board",
             to : "board",
-            index : newPlaceOnBoardIndex,
-            capturedPawn : targetCase === -1 ? targetCase : null
+            oldPlaceOnBoardIndex : oldPlaceOnBoardIndex,
+            newPlaceOnBoardIndex : newPlaceOnBoardIndex,
+            capturedPawn : targetCase !== -1 ? targetCase : null
         }
+    }
+
+    #backPawnToBase(pawnToEject){
+        const pawnPosition = INITIAL_PAWNS.findIndex(pawns => pawns.includes(pawnToEject));
+        if(pawnPosition === -1) return;
+
+        const home = this.#homes[pawnPosition];
+        home.push(pawnToEject);
+
+        this.#board = this.#board.map(p => p === pawnToEject ? -1 : p)
+    }
+
+    getPlayerWhoIsPlaying(){
+        const playerWhoIsPlaying = this.#players.find(p => p.isPlaying()) ?? null;
+        return playerWhoIsPlaying;
+    }
+
+    moveToTheNextTurn(){
+        const playerWhoIsPlayingIndex = this.#playerWhoIsPlayingIndex;
+
+        this.#players[playerWhoIsPlayingIndex].turnEnd();
+        this.#players[playerWhoIsPlayingIndex].resetRollThisTurn();
+
+        let nextPlayerIndex = (playerWhoIsPlayingIndex + 1) % this.#numberOfPlayers;
+        this.#players[nextPlayerIndex].turnStart();
+        this.#players[nextPlayerIndex].resetRollThisTurn();
+
+        this.#playerWhoIsPlayingIndex = nextPlayerIndex;
+
+        if(nextPlayerIndex === 0) this.#numberOfTotalRound++;
+    }
+
+    isGameFinished(){
+        for(let i=0; i<this.#numberOfPlayers; i++){
+            const isEndCaseFull = !this.#stairs[i].includes(-1);
+            if(isEndCaseFull) return {finished: true, winner: i};
+        }
+
+        return {finished: false}
     }
 
     launchDice(username, cheat){
         for(const player of this.#players){
             if(player.isPlaying() && player.username() === username && !player.hasRolledThisTurn()){
                 player.markRolledThisTurn();
-                let dice = cheat === null ? launchDice() : cheat;
+                let dice = cheat ?? launchDice();
                 this.#dice = dice;
                 return dice;
             }
@@ -126,13 +171,39 @@ export class Game{
         return movablePawns;
     }
 
-    movePawn(pawnToMove){
-        
-    }
+    movePawn(pawnToMove, playerNumber){
+        const dice = this.#dice;
+        const moveOfThePawn = this.#getPawnMove(pawnToMove, dice, playerNumber);
+        if(!moveOfThePawn) return;
 
-    backPawnToBase(pawnToEject){
-        const pawnPosition = INITIAL_PAWNS.findIndex(pawns => pawns.includes(pawnToEject));
-        const home = this.#homes[pawnPosition];
-        home.push(pawnToEject);
+        switch (moveOfThePawn.from)
+        {
+            case "end": {
+                const stairsOfThePlayer = this.#stairs[playerNumber];
+                stairsOfThePlayer[moveOfThePawn.newPlaceOnBoardIndex] = pawnToMove;
+                stairsOfThePlayer[moveOfThePawn.oldPlaceOnBoardIndex] = -1;
+                break;
+            }
+            case "base":{
+                this.#homes[playerNumber] = this.#homes[playerNumber].filter(p => p !== pawnToMove);
+                this.#board[moveOfThePawn.newPlaceOnBoardIndex] = pawnToMove;
+                break;
+            }
+            case "board": {
+                this.#board[moveOfThePawn.oldPlaceOnBoardIndex] = -1;
+                if(moveOfThePawn.to === "board"){
+                    this.#board[moveOfThePawn.newPlaceOnBoardIndex] = pawnToMove;
+                }
+
+                if(moveOfThePawn.to === "end"){
+                    const stairsOfThePlayer = this.#stairs[playerNumber];
+                    stairsOfThePlayer[0] = pawnToMove;
+                }
+                break;
+            }
+        }
+
+        if(moveOfThePawn.capturedPawn !== null) this.#backPawnToBase(moveOfThePawn.capturedPawn);
+        return moveOfThePawn;
     }
 }
