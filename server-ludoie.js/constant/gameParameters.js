@@ -22,5 +22,5 @@ export const INITIAL_PAWNS = [
 ];
 
 export const COLORS = [
-  "#faf703", "#57cbff", "#ff0100", "#29db00"
+  "#ffc607", "#57cbff", "#ff0100", "#29db00"
 ];

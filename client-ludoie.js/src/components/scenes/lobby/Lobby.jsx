@@ -1,7 +1,7 @@
-import Player from "./Player";
+import Player from "../../commonComponents/Player";
 
 import { RedButton } from "../../styles/CommonStyleComponents";
-import { LobbyStyleWrapper, LobbyStyle, LobbyPage, TextLobbyStyle } from "./LobbyStyle";
+import { LobbyStyle, LobbyPage, TextLobbyStyle } from "./LobbyStyle";
 
 export default function Lobby({roomNumber, players, launchGame, errorMessage}){
     const color = ["#ffc607", "#57cbff", "#ff0100", "#29db00"];
@@ -14,21 +14,19 @@ export default function Lobby({roomNumber, players, launchGame, errorMessage}){
                     <p>{errorMessage}</p>
                 </div> 
             : null}
-            <LobbyStyleWrapper>
-                <LobbyStyle>
-                    <div>
-                        <TextLobbyStyle>Room : <span id="code">{roomNumber}</span></TextLobbyStyle>
-                        <TextLobbyStyle>En attente : {players.length} joueur(s)</TextLobbyStyle>
-                    </div>
-                    {players.map((player, index) => (
-                        <Player key={index} player={player} color={color[index]} index={index+1}/>
-                    ))}
-                    <RedButton onClick={launchGame} id="launchGame" 
-                        disabled={players.length < 2}
-                    >
-                        LANCER LA GAME</RedButton>
-                </LobbyStyle>
-            </LobbyStyleWrapper>
+            <LobbyStyle>
+                <div>
+                    <TextLobbyStyle>Room : <span id="code">{roomNumber}</span></TextLobbyStyle>
+                    <TextLobbyStyle>En attente : {players.length} joueur(s)</TextLobbyStyle>
+                </div>
+                {players.map((player, index) => (
+                    <Player key={index} player={player} color={color[index]} index={index+1}/>
+                ))}
+                <RedButton onClick={launchGame} id="launchGame" 
+                    disabled={players.length < 2}
+                >
+                    LANCER LA GAME</RedButton>
+            </LobbyStyle>
         </LobbyPage>
     )
 }

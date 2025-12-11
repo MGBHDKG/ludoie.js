@@ -1,4 +1,4 @@
-import { PlayerStyle , TextLobbyStyle} from "./LobbyStyle"
+import { PlayerStyle , TextLobbyStyle} from "../scenes/lobby/LobbyStyle"
 
 export default function Player({player, color, index}){
     return (

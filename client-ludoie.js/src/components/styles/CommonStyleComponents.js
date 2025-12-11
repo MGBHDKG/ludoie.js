@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const LudoieLogo = styled.img`
-    width: 90%;
+    width: 50%;
     max-width: 800px;
     height: auto;
 `

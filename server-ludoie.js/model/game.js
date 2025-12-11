@@ -164,7 +164,7 @@ export class Game{
                 color: this.#players[i].getColor()
             })
         }
-        playersRanking.sort((a,b) => a.score - b.score);
+        playersRanking.sort((a,b) => b.score - a.score);
         return playersRanking;
     }
 

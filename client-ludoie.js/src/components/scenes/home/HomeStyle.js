@@ -14,6 +14,6 @@ export const AllHomeButtons = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 60px;
+    gap: calc(20px + 3vh);
     width: 100%;
 `
