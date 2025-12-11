@@ -26,12 +26,6 @@ export const LobbyStyle = styled.div`
     padding: 10px;
 `
 
-export const TextLobbyStyle = styled.p`
-    font-size: 30px;
-    font-weight: bold;
-    margin: 0;
-`
-
 export const PlayerStyle = styled.div`
     width: 90%;
     height: 6%;

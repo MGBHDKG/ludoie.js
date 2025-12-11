@@ -27,3 +27,25 @@ canvas {
    height: 35px;
    width: auto;
 }
+
+/* Si la hauteur est supérieure à la largeur → portrait */
+@media screen and (max-aspect-ratio: 1/1) {
+  #rotate-warning {
+    display: flex;
+  }
+
+  #app-container {
+    display: none;
+  }
+}
+
+/* Si la largeur est supérieure → paysage */
+@media screen and (min-aspect-ratio: 1/1) {
+  #rotate-warning {
+    display: none;
+  }
+
+  #app-container {
+    display: block;
+  }
+}

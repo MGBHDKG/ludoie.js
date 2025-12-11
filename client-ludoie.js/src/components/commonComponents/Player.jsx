@@ -1,10 +1,11 @@
-import { PlayerStyle , TextLobbyStyle} from "../scenes/lobby/LobbyStyle"
+import { PlayerStyle} from "../scenes/lobby/LobbyStyle"
+import {TextLudoieStyle} from "../styles/CommonStyleComponents";
 
 export default function Player({player, color, index}){
     return (
         <PlayerStyle style={{backgroundColor: color}}>
-            <TextLobbyStyle>{player}</TextLobbyStyle>
-            <TextLobbyStyle>{index}</TextLobbyStyle>
+            <TextLudoieStyle>{player}</TextLudoieStyle>
+            <TextLudoieStyle>{index}</TextLudoieStyle>
         </PlayerStyle>
     )
 }

@@ -4,8 +4,9 @@ import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import { Player, Players, Dice, WhosTurn, TurnHandler, WhosTurnWrapper, Arrow, EndGameModalWrapper, EndGameModal, InnerEndGameModal, ModalText } from "./GameStyle";
+import { Player, Players, Dice, WhosTurn, TurnHandler, Arrow, EndGameModalWrapper, EndGameModal, InnerEndGameModal, ModalText } from "./GameStyle";
 import { RedButton } from "../../styles/CommonStyleComponents";
+import { TextLudoieStyle } from "../../styles/CommonStyleComponents";
 
 import { drawBoard } from "./board";
 import {fitRendererToCanvas, cloneWithUniqueMaterials, tintObject} from './utilsTHREE';
@@ -243,17 +244,17 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
       <canvas ref={canvasRef}></canvas>
       <Players>
         {players.map((player, index) => (
-          <Player key={index} style={{backgroundColor: color[index], height: player.isPlaying ? 150 : 100}}>
+          <Player key={index} style={{backgroundColor: color[index], height: player.isPlaying ? "calc(40px + 10vh)" : "calc(10px + 10vh)"}}>
             <p>{player.username === username ? "Toi (" + player.username + ")" : player.username}</p>
           </Player>
         ))}
       </Players>
       <TurnHandler>
-        <WhosTurnWrapper>
-          <WhosTurn>
+        <WhosTurn>
+          <TextLudoieStyle>
             A {players.map(player => (player.isPlaying === true ? player.username === username ? "toi"  : player.username : null))} de jouer
-          </WhosTurn>
-        </WhosTurnWrapper>
+          </TextLudoieStyle>
+        </WhosTurn>
         {players.map(player => (player.isPlaying === true ? player.username === username ? <Arrow src="arrow.png"/> : null : null))}
         <Dice src="dice00.png" alt="dice" onClick={launchDice} ref={diceRef}/>
       </TurnHandler>

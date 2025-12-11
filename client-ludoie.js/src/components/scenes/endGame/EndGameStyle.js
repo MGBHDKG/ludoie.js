@@ -6,7 +6,9 @@ export const EndGameStyle = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     background-color: #267182;
+    color: white;
 `
 
 export const Tabs = styled.div`
@@ -15,20 +17,12 @@ export const Tabs = styled.div`
     gap: 50px;
     height: 40px;
     background-color: #8eb997;
-    font-size: 20px;
-    color: white;
-    font-weight: bold;
     border-top: 15px solid #c5a226;
     border-right: 15px solid #c5a226;
     border-bottom: 0;
     border-left: 15px solid #c5a226;
     border-radius: 20px 20px 0 0;
-    margin-top: 50px;
     padding: 5px;
-
-    p{
-        cursor: pointer;
-    }
 `
 
 export const RankingAndStats = styled.div`

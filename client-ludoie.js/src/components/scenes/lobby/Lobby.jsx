@@ -1,7 +1,8 @@
 import Player from "../../commonComponents/Player";
 
 import { RedButton } from "../../styles/CommonStyleComponents";
-import { LobbyStyle, LobbyPage, TextLobbyStyle } from "./LobbyStyle";
+import { LobbyStyle, LobbyPage } from "./LobbyStyle";
+import { TextLudoieStyle } from "../../styles/CommonStyleComponents";
 
 export default function Lobby({roomNumber, players, launchGame, errorMessage}){
     const color = ["#ffc607", "#57cbff", "#ff0100", "#29db00"];
@@ -16,8 +17,8 @@ export default function Lobby({roomNumber, players, launchGame, errorMessage}){
             : null}
             <LobbyStyle>
                 <div>
-                    <TextLobbyStyle>Room : <span id="code">{roomNumber}</span></TextLobbyStyle>
-                    <TextLobbyStyle>En attente : {players.length} joueur(s)</TextLobbyStyle>
+                    <TextLudoieStyle>Room : <span id="code">{roomNumber}</span></TextLudoieStyle>
+                    <TextLudoieStyle>En attente : {players.length} joueur(s)</TextLudoieStyle>
                 </div>
                 {players.map((player, index) => (
                     <Player key={index} player={player} color={color[index]} index={index+1}/>

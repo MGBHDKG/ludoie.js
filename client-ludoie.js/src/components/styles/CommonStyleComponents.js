@@ -33,3 +33,9 @@ export const LudoieInput = styled.input`
     border-radius: 10px;
     border: none;
 `
+
+export const TextLudoieStyle = styled.p`
+    font-size: calc(20px + 0.5vw);
+    font-weight: bold;
+    margin: 0;
+`

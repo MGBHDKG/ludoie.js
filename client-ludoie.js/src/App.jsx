@@ -6,6 +6,8 @@ import Lobby from "./components/scenes/lobby/Lobby";
 import JoinGame from "./components/scenes/joinGame/JoinGame";
 import EndGame from "./components/scenes/endGame/EndGame";
 
+import { mockRankingAndStatistics, mockPlayers } from "./components/componentsForTests/constantsForTests";
+
 import { io } from "socket.io-client";
 
 const PROD = false;
@@ -79,6 +81,10 @@ export default function App() {
 
   return (
     <>
+    <div id="rotate-warning">
+      <p>GROS CACA</p>
+    </div>
+    <div id="app-container">
       {
         screen === "home" && (
           <Home setScreen={setScreen} setUsername={setUsername} createGame={createGame} username={username} errorMessage={errorMessage} displayError={displayError} />
@@ -104,6 +110,7 @@ export default function App() {
           <EndGame rankingAndStatistics={rankingAndStatistics} />
         )
       }
+      </div>
     </>
   )
 }

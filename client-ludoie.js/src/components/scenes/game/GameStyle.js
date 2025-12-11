@@ -9,16 +9,15 @@ export const TurnHandler = styled.div`
     right: 0;
     bottom: 0;
     width: 20vw;
-    min-width: 300px;
-    height: 50vh;
+    min-width: 200px;
 `
 
 export const Player = styled.div`
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    height: 100px;
     width: 200px;
+    font-size: calc(10px + 0.5vw);
 `
 
 export const Players = styled.div`
@@ -27,17 +26,6 @@ export const Players = styled.div`
     display: flex;
     justify-content: space-evenly;
     width: 100%;
-`
-
-export const WhosTurnWrapper = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 300px;
-    height: 20vh;
-    max-height: 180px;
-    background-color: #c5a226;
-    border-radius: 20px;
 `
 
 export const Dice = styled.img`
@@ -50,18 +38,19 @@ export const WhosTurn = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #8eb997;
     width: 80%;
     height: 80%;
     border-radius: 20px;
     color: white;
-    font-size: 25px;
-    font-weight: bold;
     text-align: center;
+    background-color: #8eb997;
+    border: calc(10px + 0.5vw) solid #c5a226;
+    border-radius: 20px;
+    padding: calc(10px + 2vh) 0;
 `
 
 export const Arrow = styled.img`
-    height: 10vh;
+    height: 8vh;
     max-height: 80px;
     width: auto;
 `
