@@ -161,6 +161,7 @@ export class Game{
             playersRanking.push({
                 username: this.#players[i].username(),
                 score: score,
+                color: this.#players[i].getColor()
             })
         }
         playersRanking.sort((a,b) => a.score - b.score);
@@ -172,7 +173,7 @@ export class Game{
             const isEndCaseFull = !this.#stairs[i].includes(-1);
             if(isEndCaseFull){
                 const playersRanking = this.computeRanking();
-                return {finished: true, playersRanking: playersRanking};
+                return {finished: true, playersRanking: playersRanking,};
             }
         }
 

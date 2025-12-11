@@ -17,6 +17,7 @@ export default function App() {
   const [roomNumber, setRoomNumber] = useState(0);
   const [players, setPlayers] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [rankingAndStatistics, setRankingAndStatistics] = useState([]);
 
   const displayError = (message) =>{
     setErrorMessage(message);
@@ -85,7 +86,7 @@ export default function App() {
       }
       {
         screen === "game" && (
-          <Game roomNumber={roomNumber} players={players} socket={socket} username={username} setPlayers={setPlayers} setScreen={setScreen}/>
+          <Game roomNumber={roomNumber} players={players} socket={socket} username={username} setPlayers={setPlayers} setScreen={setScreen} setRankingAndStatistics={setRankingAndStatistics} />
         )
       }
       {
@@ -100,7 +101,7 @@ export default function App() {
       }
       {
         screen === "endGame" && (
-          <EndGame />
+          <EndGame rankingAndStatistics={rankingAndStatistics} />
         )
       }
     </>

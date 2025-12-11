@@ -3,6 +3,7 @@ import {getRoom, roomExists, setRoom,  deleteRoom, getGame, setGame, deleteGame}
 import { Player } from "../model/player.js";
 import { Game } from "../model/game.js";
 import { playerStatistics } from "../model/playerStatistics.js" 
+import { COLORS } from "../constant/gameParameters.js";
 
 export function socketHandlers(io){
     io.on("connection", (socket) => {
@@ -105,7 +106,7 @@ export function socketHandlers(io){
             let players = [];
             for(let i=0; i<room.length; i++){
                 const stats =  new playerStatistics();
-                players[i] = new Player(room[i], i, stats);
+                players[i] = new Player(room[i], i, stats, COLORS[i]);
             }
 
             deleteRoom(code);
@@ -193,7 +194,7 @@ export function socketHandlers(io){
                 setTimeout(() => {
                     io.to(code).emit("gameIsFinished", gameState.playersRanking);
                 }, 2000);
-                console.log(`Game finie, voici le classement : ${gameState.playersRanking}`);
+                console.log(`Game finie de la room ${code}`);
                 return;
             }
 

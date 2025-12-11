@@ -12,7 +12,7 @@ import {fitRendererToCanvas, cloneWithUniqueMaterials, tintObject} from './utils
 import { drawMovablePawns, movePawn, movePawnToBase, movePawnToEndCase, unhighlightMovablePawns } from "./pawn";
 import { handleDice, handleDiceWithKeyboard } from "./dice";
 
-export default function Game({roomNumber, players, socket, username, setPlayers, setScreen}){
+export default function Game({roomNumber, players, socket, username, setPlayers, setScreen, setRankingAndStatistics}){
   const launchDice = () => handleDice(players, socket, username, roomNumber);
   handleDiceWithKeyboard(players, socket, username, roomNumber);
 
@@ -32,12 +32,9 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
       dice.src = `dice0${diceNumber}.png`;
     })
 
-    socket.on("gameIsFinished", winner => {
-      alert(winner + " a gagné la game !");
-      console.log(winner);
-      setTimeout(() => {
-        setScreen("home");
-      }, 8000)
+    socket.on("gameIsFinished", gameStats => {
+      setRankingAndStatistics(gameStats);
+      setScreen("endGame");
     })
 
     socket.on("turnChanged", players => {

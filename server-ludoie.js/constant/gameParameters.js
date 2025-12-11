@@ -20,3 +20,7 @@ export const INITIAL_PAWNS = [
   ['I','J','K','L'],
   ['M','N','O','P']
 ];
+
+export const COLORS = [
+  "#faf703", "#57cbff", "#ff0100", "#29db00"
+];
