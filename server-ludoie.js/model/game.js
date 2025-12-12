@@ -19,7 +19,7 @@ export class Game{
     #movablePawns;
     #playerWhoIsPlayingIndex = 0;
     #dice;
-    #numberOfTotalRound = 0;
+    #numberOfTotalRound = 1;
     #numberOfPlayers;
 
     constructor(players){
@@ -158,11 +158,14 @@ export class Game{
 
         for(let i = 0; i<this.#numberOfPlayers; i++){
             const score = this.#stairs[i].reduce((sum, v) => sum + (v !== -1 ? 1 : 0), 0);
-            playersRanking.push({
+
+            let playerStatistics = this.#players[i].getPlayerStatistics().returnAllStatistics();
+
+            playersRanking.push({...{
                 username: this.#players[i].username(),
                 score: score,
                 color: this.#players[i].getColor()
-            })
+            }, ... playerStatistics})
         }
         playersRanking.sort((a,b) => b.score - a.score);
         return playersRanking;
@@ -185,6 +188,11 @@ export class Game{
             if(player.isPlaying() && player.username() === username && !player.hasRolledThisTurn()){
                 player.markRolledThisTurn();
                 let dice = cheat ?? launchDice();
+
+                let statistics = player.getPlayerStatistics();
+                statistics.storeDice(dice);
+                if(dice === 6) statistics.incrementNumberOfSix();
+
                 this.#dice = dice;
                 return dice;
             }
@@ -203,7 +211,8 @@ export class Game{
         return movablePawns;
     }
 
-    movePawn(pawnToMove, playerNumber){
+    movePawn(pawnToMove, player){
+        const playerNumber = player.getPlayerNumber();
         const dice = this.#dice;
         const moveOfThePawn = this.#getPawnMove(pawnToMove, dice, playerNumber);
         if(!moveOfThePawn) return null;
@@ -235,7 +244,18 @@ export class Game{
             }
         }
 
-        if(moveOfThePawn.capturedPawn !== null) this.#backPawnToBase(moveOfThePawn.capturedPawn);
+        let statisticsOfThePlayer = player.getPlayerStatistics();
+        statisticsOfThePlayer.storeMove(dice);
+
+        if(moveOfThePawn.capturedPawn !== null){
+            statisticsOfThePlayer.incrementNumberOfPawnEaten();
+
+            let indexOfThePlayerWhoGotEaten = INITIAL_PAWNS.findIndex(pawns => pawns.includes(moveOfThePawn.capturedPawn));
+            let playerWhoGotEaten = this.#players[indexOfThePlayerWhoGotEaten];
+            let statisticsOfThePlayerWhoGotEaten = playerWhoGotEaten.getPlayerStatistics();
+            statisticsOfThePlayerWhoGotEaten.incrementNumberOfTimeOfGettingEaten(); 
+            this.#backPawnToBase(moveOfThePawn.capturedPawn);
+        }
         return moveOfThePawn;
     }
 }

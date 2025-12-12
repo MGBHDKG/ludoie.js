@@ -10,6 +10,7 @@ export const TurnHandler = styled.div`
     bottom: 0;
     width: 20vw;
     min-width: 200px;
+    gap: 10px;
 `
 
 export const Player = styled.div`

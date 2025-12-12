@@ -14,7 +14,15 @@ export default function Home({setScreen, setUsername, createGame, username, erro
                 <AllHomeButtons>
                     <LudoieInput  onChange={(e) => setUsername(e.target.value)} id="username" placeholder="Nom d'utilisateur"></LudoieInput>
                     <RedButton onClick={createGame} id="createGame">Créer une partie</RedButton>
-                    <RedButton onClick={() => {if(username != "") setScreen("joinGame"); else displayError("Nom d'utilisateur vide"); }} id="joinGame">Rejoindre une partie</RedButton>
+                    <RedButton onClick={() => {
+                        var error = "";
+                        if(username === "") error = "Nom d'utilisateur vide";
+                        if(username.length > 15) error = "Nom d'utilisateur trop long"
+                        if(error === "") setScreen("joinGame"); 
+                        else displayError(error);
+                        }
+                    } 
+                    id="joinGame">Rejoindre une partie</RedButton>
                     <RedButton onClick={() => {alert("PAGE EN TRAVAUX")}}>Règles du jeu</RedButton>
                 </AllHomeButtons>
         </HomeStyle>

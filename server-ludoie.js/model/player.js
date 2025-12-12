@@ -25,9 +25,7 @@ export class Player {
     username(){ return this.#username; }
 
     getPlayerNumber(){ return this.#playerNumber; }
-
-    getPlayerStatistic() { return this.#statistics; }
-
+    getPlayerStatistics() { return this.#statistics; }
     getColor() { return this.#color; }
 
     static checkUsername(username){

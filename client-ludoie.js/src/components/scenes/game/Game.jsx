@@ -14,8 +14,8 @@ import { drawMovablePawns, movePawn, movePawnToBase, movePawnToEndCase, unhighli
 import { handleDice, handleDiceWithKeyboard } from "./dice";
 
 export default function Game({roomNumber, players, socket, username, setPlayers, setScreen, setRankingAndStatistics}){
-  const launchDice = () => handleDice(players, socket, username, roomNumber);
-  handleDiceWithKeyboard(players, socket, username, roomNumber);
+  const launchDice = () => handleDice(players, socket, username);
+  handleDiceWithKeyboard(players, socket, username);
 
   const [msg, setMsg] = useState("")
 
@@ -34,6 +34,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
     })
 
     socket.on("gameIsFinished", gameStats => {
+      console.log(gameStats)
       setRankingAndStatistics(gameStats);
       setScreen("endGame");
     })
@@ -221,9 +222,7 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
       const player = players.find(p => p.username === username);
 
       socket.emit("pawnSelected", 
-        pawnId,
-        roomNumber,
-        player.username,
+        pawnId
       );
     }
 

@@ -40,7 +40,7 @@ export default function App() {
   }
 
   const launchGame = () => {
-    socket.emit("startGame", roomNumber);
+    socket.emit("startGame");
   };
 
   useEffect(() => {

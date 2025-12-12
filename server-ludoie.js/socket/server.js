@@ -2,7 +2,7 @@ import {generateRoomNumber} from "../game/randomGeneration.js";
 import {getRoom, roomExists, setRoom,  deleteRoom, getGame, setGame, deleteGame} from "../game/roomAndGameStructures.js";
 import { Player } from "../model/player.js";
 import { Game } from "../model/game.js";
-import { playerStatistics } from "../model/playerStatistics.js" 
+import { PlayerStatistics } from "../model/playerStatistics.js" 
 import { COLORS } from "../constant/gameParameters.js";
 
 export function socketHandlers(io){
@@ -96,7 +96,9 @@ export function socketHandlers(io){
             }
         })
 
-        socket.on("startGame", (code) => {
+        socket.on("startGame", () => {
+            const code = socket.data.code;
+            
             const room = getRoom(code);
             if(room.length < 2 || room.length > 4){
                 io.to(code).emit("error", "Nombre de joueurs incorrect");
@@ -105,7 +107,7 @@ export function socketHandlers(io){
 
             let players = [];
             for(let i=0; i<room.length; i++){
-                const stats =  new playerStatistics();
+                const stats =  new PlayerStatistics();
                 players[i] = new Player(room[i], i, stats, COLORS[i]);
             }
 
@@ -122,7 +124,9 @@ export function socketHandlers(io){
             console.log(`Game de la room ${code} commencée`)
         })
 
-        socket.on("launchDice", (username, code, cheat) => { 
+        socket.on("launchDice", (cheat) => { 
+            const username = socket.data.username;
+            const code = socket.data.code;
             let game = getGame(code);
             const dice = game.launchDice(username, cheat);
             if(!dice)return;
@@ -144,6 +148,8 @@ export function socketHandlers(io){
             else
             {
                 if(dice != 6){
+                    let statistics = player.getPlayerStatistics();
+                    statistics.incrementNumberOfRoundWithoutPlaying();
                     game.moveToTheNextTurn();
                     const updatedPlayers = game.getPlayers();
                     const updatedPlayersObj = updatedPlayers.map(p => p.convertPlayerToObj());
@@ -158,7 +164,10 @@ export function socketHandlers(io){
             }
         })
 
-        socket.on("pawnSelected", (pawnToMove, code, username) => {
+        socket.on("pawnSelected", (pawnToMove) => {
+            const username = socket.data.username;
+            const code = socket.data.code;
+
             let game = getGame(code);
             if (!game) return;
 
@@ -172,8 +181,9 @@ export function socketHandlers(io){
 
             let players = game.getPlayers();
             const player = players.find(p => p.username() === username);
+            if(!player || !player.isPlaying()) return;
             const playerNumber = player.getPlayerNumber();
-            const moveDoneByThePawn = game.movePawn(pawnToMove, playerNumber);
+            const moveDoneByThePawn = game.movePawn(pawnToMove, player);
             if(!moveDoneByThePawn) return;
 
             if(moveDoneByThePawn.from != "end" && moveDoneByThePawn.to != "end"){
