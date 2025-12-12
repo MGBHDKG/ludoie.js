@@ -28,10 +28,23 @@ canvas {
    width: auto;
 }
 
+#rotate-warning img{
+  width: 100px;
+  height: auto;
+}
+
 /* Si la hauteur est supérieure à la largeur → portrait */
 @media screen and (max-aspect-ratio: 1/1) {
   #rotate-warning {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
+    color: white;
+    text-align: center;
   }
 
   #app-container {

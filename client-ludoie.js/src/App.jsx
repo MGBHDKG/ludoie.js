@@ -82,7 +82,8 @@ export default function App() {
   return (
     <>
     <div id="rotate-warning">
-      <p>GROS CACA</p>
+      <img src="rotation-mobile.png" alt="rotate-phone-icon" />
+      <p>Veuillez tourner votre téléphone en mode portrait pour utiliser ce site.</p>
     </div>
     <div id="app-container">
       {
