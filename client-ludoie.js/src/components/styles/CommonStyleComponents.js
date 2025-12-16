@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const LudoieLogo = styled.img`
     width: 50%;
-    max-width: 800px;
+    max-width: 600px;
     height: auto;
 `
 
@@ -28,7 +28,7 @@ export const RedButton = styled.button`
 
 export const LudoieInput = styled.input`
     width: 60%;
-    max-width: 300px;   
+    max-width: 300px;
     height: 40px;
     border-radius: 10px;
     border: none;
@@ -38,4 +38,14 @@ export const TextLudoieStyle = styled.p`
     font-size: calc(20px + 0.5vw);
     font-weight: bold;
     margin: 0;
+`
+
+export const PlayerStyle = styled.div`
+    width: 90%;
+    height: 6%;
+    max-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
 `

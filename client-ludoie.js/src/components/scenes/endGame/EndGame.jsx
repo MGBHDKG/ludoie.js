@@ -37,7 +37,32 @@ export default function EndGame({rankingAndStatistics}){
                     )
                 ))}
                 {tab === "statistics" && (
-                    <TextLudoieStyle>EN CONSTRUCTION 🧱🔧</TextLudoieStyle>
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Nombre de rounds sans avoir joué</th>
+                                <th>Nombre de pions mangés</th>
+                                <th>Nombre de fois en étant mangés</th>
+                                <th>Nombre de six</th>
+                                <th>Dé moyen</th>
+                                <th>Déplacement moyen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rankingAndStatistics.map((statOfOnePlayer, index) => (
+                                <tr key={index}>
+                                    <td>{statOfOnePlayer.username}</td>
+                                    <td>{statOfOnePlayer.numberOfRoundWithoutPlaying}</td>
+                                    <td>{statOfOnePlayer.numberOfPawnEaten}</td>
+                                    <td>{statOfOnePlayer.numberOfTimeOfGettingEaten}</td>
+                                    <td>{statOfOnePlayer.numberOfSix}</td>
+                                    <td>{statOfOnePlayer.averageDice.toFixed(2)}</td>
+                                    <td>{statOfOnePlayer.averageMove.toFixed(2)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 )}
             </RankingAndStats>
         </EndGameStyle>

@@ -10,11 +10,10 @@ import { mockRankingAndStatistics, mockPlayers } from "./components/componentsFo
 
 import { io } from "socket.io-client";
 
-const PROD = false;
-const socket = PROD === true ? io("https://api.wfun.games") : io("http://localhost:4000");
+const socket = import.meta.env.VITE_PROD === "true" ? io("https://api.wfun.games") : io("http://localhost:4000");
 
 export default function App() {
-  const [screen, setScreen] = useState("home");
+  const [screen, setScreen] = useState("endGame");
   const [username, setUsername] = useState("");
   const [roomNumber, setRoomNumber] = useState(0);
   const [players, setPlayers] = useState([]);
@@ -108,7 +107,7 @@ export default function App() {
       }
       {
         screen === "endGame" && (
-          <EndGame rankingAndStatistics={rankingAndStatistics} />
+          <EndGame rankingAndStatistics={mockRankingAndStatistics} />
         )
       }
       </div>

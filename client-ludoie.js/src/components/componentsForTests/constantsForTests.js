@@ -1,11 +1,11 @@
-export const mockRankingAndStatistics = [
+export const mockPlayers = [
   { username: "Alice", score: 4, color: "#ffc607" },
   { username: "Bob", score: 3, color: "#57cbff" },
   { username: "Charlie", score: 2, color: "#ff0100" },
   { username: "Catalina", score: 1, color: "#29db00"}
 ];
 
-export const mockPlayers = [
+export const mockRankingAndStatistics = [
   {
     username: "Alice",
     isPlaying: true,
@@ -14,7 +14,7 @@ export const mockPlayers = [
     score: 4,
     color: "#ffc607",
 
-    numberOfRoundWithoutPlaying: 5,
+    numberOfRoundWithoutPlaying: 0,
     numberOfPawnEaten: 4,
     numberOfTimeOfGettingEaten: 0,
     numberOfSix: 36,

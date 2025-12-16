@@ -30,8 +30,7 @@ export const RankingAndStats = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 70vw;
-    max-width: 700px;
+    min-width: 50vw;
     background-color: #8eb997;
     color: white;
     border: 20px solid #c5a226;

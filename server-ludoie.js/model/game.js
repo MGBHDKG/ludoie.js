@@ -187,7 +187,7 @@ export class Game{
         for(const player of this.#players){
             if(player.isPlaying() && player.username() === username && !player.hasRolledThisTurn()){
                 player.markRolledThisTurn();
-                let dice = cheat ?? launchDice();
+                let dice = process.env.PROD === "true" ? launchDice() : cheat ?? launchDice();
 
                 let statistics = player.getPlayerStatistics();
                 statistics.storeDice(dice);

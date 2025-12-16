@@ -1,4 +1,4 @@
-import { PlayerStyle} from "../scenes/lobby/LobbyStyle"
+import { PlayerStyle } from "../styles/CommonStyleComponents";
 import {TextLudoieStyle} from "../styles/CommonStyleComponents";
 
 export default function Player({player, color, index}){

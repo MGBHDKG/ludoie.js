@@ -25,13 +25,3 @@ export const LobbyStyle = styled.div`
     border-radius: 20px;
     padding: 10px;
 `
-
-export const PlayerStyle = styled.div`
-    width: 90%;
-    height: 6%;
-    max-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-`

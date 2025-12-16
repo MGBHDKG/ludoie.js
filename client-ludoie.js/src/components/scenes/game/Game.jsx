@@ -34,7 +34,6 @@ export default function Game({roomNumber, players, socket, username, setPlayers,
     })
 
     socket.on("gameIsFinished", gameStats => {
-      console.log(gameStats)
       setRankingAndStatistics(gameStats);
       setScreen("endGame");
     })

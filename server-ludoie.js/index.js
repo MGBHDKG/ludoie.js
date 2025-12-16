@@ -3,8 +3,10 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 import { socketHandlers } from "./socket/server.js";
+import dotenv from "dotenv";
 
-const PORT = 4000;
+dotenv.config();
+const PORT = process.env.PORT || 4000;
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
